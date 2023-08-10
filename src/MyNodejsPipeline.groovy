@@ -1,14 +1,14 @@
 // pipeline-library-demo/src/MyNodejsPipeline.groovy
 class MyNodejsPipeline {
     static void build() {
-        sh 'npm install'
+        steps.sh 'npm install'
     }
 
     static void test() {
-        sh 'npm test'
+        steps.sh 'npm test'
     }
 
     static void deploy() {
-        sh 'npm start'
+        steps.sh 'npm start'
     }
 }
