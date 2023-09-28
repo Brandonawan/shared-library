@@ -3,7 +3,7 @@
 stage('Demo') {
 
   echo 'Hello World'
-
+  runPipeline()
   sayHello 'Dave'
 
 }
