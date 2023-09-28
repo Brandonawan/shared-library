@@ -1,28 +1,25 @@
 pipeline {
     agent any
-
+    
     stages {
-        stage('Load YAML Config') {
+        stage('Read YAML') {
             steps {
                 script {
-                    def configFile = new File('config.yaml')
-                    if (configFile.exists()) {
-                        def yaml = readYaml file: configFile
-                        env.APP_NAME = yaml.app_name
-                        env.ENVIRONMENT = yaml.environment
-                        env.BUILD_VERSION = yaml.build_version
-                    } else {
-                        error "Config file 'config.yaml' not found!"
-                    }
+                    def yamlData = readYaml file: 'pipeline-config.yml'
+                    
+                    // Access data from the YAML file
+                    def name = yamlData.name
+                    def age = yamlData.age
+                    def email = yamlData.email
+                    
+                    // Print the values for demonstration
+                    echo "Name: ${name}"
+                    echo "Age: ${age}"
+                    echo "Email: ${email}"
                 }
             }
         }
-
-        stage('Build and Deploy') {
-            steps {
-                sh "echo Building ${env.APP_NAME} version ${env.BUILD_VERSION} for ${env.ENVIRONMENT}"
-                // Your build and deployment steps here
-            }
-        }
+        
+        // Add more stages as needed for your Jenkins pipeline
     }
 }
