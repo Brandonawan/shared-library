@@ -1,7 +1,5 @@
 #!/usr/bin/env groovy
 
-// vars/default.groovy
-
 def call() {
     pipeline {
         agent any
