@@ -1,35 +1,10 @@
 #!/usr/bin/env groovy
 
-def checkFileExists(String filePath) {
-    if (!fileExists(filePath)) {
-        error "File not found: ${filePath}"
-    }
-}
-
-def checkFileExecutable(String filePath) {
-    if (!fileExecutable(filePath)) {
-        error "File is not executable: ${filePath}"
-    }
-}
-
 def call() {
     pipeline {
         agent any
 
         stages {
-            stage('Check Files') {
-                steps {
-                    script {
-                        // Check if pipeline-config.yml exists
-                        checkFileExists 'pipeline-config.yml'
-                        
-                        // Check if jenkin-build script exists and is executable
-                        checkFileExists 'jenkin-build'
-                        checkFileExecutable 'jenkin-build'
-                    }
-                }
-            }
-
             stage('Read YAML') {
                 steps {
                     script {
