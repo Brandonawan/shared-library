@@ -5,10 +5,15 @@ pipeline {
         stage('Load YAML Config') {
             steps {
                 script {
-                    def yaml = new org.yaml.snakeyaml.Yaml().load(new File('config.yaml'))
-                    env.APP_NAME = yaml.app_name
-                    env.ENVIRONMENT = yaml.environment
-                    env.BUILD_VERSION = yaml.build_version
+                    def configFile = new File('config.yaml')
+                    if (configFile.exists()) {
+                        def yaml = readYaml file: configFile
+                        env.APP_NAME = yaml.app_name
+                        env.ENVIRONMENT = yaml.environment
+                        env.BUILD_VERSION = yaml.build_version
+                    } else {
+                        error "Config file 'config.yaml' not found!"
+                    }
                 }
             }
         }
