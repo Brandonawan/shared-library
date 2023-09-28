@@ -1,0 +1,3 @@
+app_name: MyApp
+environment: production
+build_version: 1.0.0
