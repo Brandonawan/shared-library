@@ -1,12 +1,13 @@
 @Library('pipeline-library-demo')_
+runPipeline()
 
-stage('Demo') {
+// stage('Demo') {
 
-  echo 'Hello World'
-  runPipeline()
-  sayHello 'Dave'
+//   echo 'Hello World'
+//   runPipeline()
+//   sayHello 'Dave'
 
-}
+// }
 
 
 // pipeline {
