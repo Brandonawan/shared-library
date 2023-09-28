@@ -1,7 +1,6 @@
-@Library('your-shared-library') _
-
+@Library('pipeline-library-demo')_
+sayHello 'Dave'
 runMyPipeline()
-
 
 // stage('Demo') {
 
