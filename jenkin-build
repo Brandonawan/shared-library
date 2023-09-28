@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# This script accepts three arguments: name, age, and email
+name="$1"
+age="$2"
+email="$3"
+
+# You can use the values in your script
+echo "Running jenkin-build script..."
+echo "Name: $name"
+echo "Age: $age"
+echo "Email: $email"
+
+# Add your build logic here
+# For example, you can use these values to customize the build process

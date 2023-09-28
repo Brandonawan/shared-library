@@ -20,6 +20,12 @@ pipeline {
             }
         }
         
-        // Add more stages as needed for your Jenkins pipeline
+        stage('Run jenkin-build Script') {
+            steps {
+                // Assuming 'jenkin-build' is in the same directory as the Jenkinsfile
+                sh './jenkin-build "${name}" "${age}" "${email}"'
+            }
+        }
+        
     }
 }
