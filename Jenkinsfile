@@ -1,6 +1,5 @@
 @Library('pipeline-library-demo')_
-
-MyPipeline.runPipeline()
+MyPipeline
 
 // stage('Demo') {
 
