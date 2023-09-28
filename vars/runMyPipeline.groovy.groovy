@@ -1,4 +1,5 @@
-// Define a custom step named 'runMyPipeline'
+#!/usr/bin/env groovy
+
 def call() {
     pipeline {
         agent any
