@@ -4,8 +4,6 @@ pipeline {
     stages {
         stage('Read YAML') {
             steps {
-                script{ datas = readYaml (file: 'pipeline-config.yml') }
-                echo datas.ear_file.deploy.toString()
                 script {
                     def yamlData = readYaml file: 'pipeline-config.yml'
                     
