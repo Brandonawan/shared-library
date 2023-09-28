@@ -1,15 +1,12 @@
 pipeline {
     agent any
 
-    // Define yamlData at the top level so it's accessible in all stages
-    def yamlData
-
     stages {
         stage('Read YAML') {
             steps {
                 script {
-                    // Read YAML data and assign it to the top-level yamlData variable
-                    yamlData = readYaml file: 'pipeline-config.yml'
+                    // Define yamlData within the script block
+                    def yamlData = readYaml file: 'pipeline-config.yml'
 
                     // Access data from the YAML file
                     def name = yamlData.name
