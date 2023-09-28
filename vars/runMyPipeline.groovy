@@ -9,7 +9,7 @@ def call() {
                 steps {
                     script {
                         // Define yamlData within the script block
-                        def yamlData = readYaml file: '../../config/pipeline-config.yml'
+                        def yamlData = readYaml file: '/var/lib/jenkins/config/pipeline-config.yml'
                         
                         // Access data from the YAML file
                         def name = yamlData.name
