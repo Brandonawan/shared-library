@@ -22,8 +22,17 @@ pipeline {
         
         stage('Run jenkin-build Script') {
             steps {
-                // Assuming 'jenkin-build' is in the same directory as the Jenkinsfile
-                sh './jenkin-build "${name}" "${age}" "${email}"'
+                script {
+                    def name = yamlData.name
+                    def age = yamlData.age
+                    def email = yamlData.email
+
+                    // Pass the values as environment variables to the script
+                    sh "./jenkin-build",
+                    "-DNAME=${name}",
+                    "-DAGE=${age}",
+                    "-DEMAIL=${email}"
+                }
             }
         }
         
