@@ -1,11 +1,15 @@
 #!/bin/bash
 
-# Access the values as environment variables
-name="$NAME"
-age="$AGE"
-email="$EMAIL"
+# Load the YAML file
+yamlFile="pipeline-config.yml"
+eval $(cat "$yamlFile" | sed 's/:[^:\/\/]/="/;s/$/"/')
 
-# You can use the values in your script
+# Access the variables
+name="$name"
+age="$age"
+email="$email"
+
+# Use the values in your script
 echo "Running jenkin-build script..."
 echo "Name: $name"
 echo "Age: $age"
