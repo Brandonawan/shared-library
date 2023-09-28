@@ -1,13 +1,3 @@
-pipeline:
-  agent:
-    label: 'my-agent'
-  stages:
-    - stage: Build
-      steps:
-        - sh 'echo "Building..."'
-    - stage: Test
-      steps:
-        - sh 'echo "Testing..."'
-    - stage: Deploy
-      steps:
-        - sh 'echo "Deploying..."'
+name: John Doe
+age: 30
+email: johndoe@example.com
