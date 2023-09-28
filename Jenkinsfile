@@ -1,5 +1,5 @@
 @Library('pipeline-library-demo')_
-sayHello 'Dave'
+// sayHello 'Dave'
 runMyPipeline()
 
 // stage('Demo') {
