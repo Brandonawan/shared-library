@@ -1,4 +1,4 @@
-// #!/usr/bin/env groovy
+#!/usr/bin/env groovy
 
 // def call() {
 //     pipeline {
@@ -36,7 +36,6 @@
 //     }
 // }
 
-#!/usr/bin/env groovy
 
 def call() {
     pipeline {
