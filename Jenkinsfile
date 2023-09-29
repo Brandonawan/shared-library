@@ -3,7 +3,13 @@
 
 
 pipeline {
-    agent any
+    agent {
+        docker {
+            // Pull the Ubuntu image and run as root user
+            image 'ubuntu:latest'
+            args '--user=root'
+        }
+    }
 
     stages {
         stage('Checkout') {
@@ -13,13 +19,6 @@ pipeline {
         }
 
         stage('Run Inside Ubuntu Docker Image') {
-            agent {
-                docker {
-                    // Pull the Ubuntu image and use privileged mode
-                    image 'ubuntu:latest'
-                    args '--privileged'
-                }
-            }
             steps {
                 sh 'apt-get update'
                 sh 'apt-get install -y python3-venv' // Install Python virtualenv
@@ -38,6 +37,7 @@ pipeline {
         }
     }
 }
+
 
 
 
