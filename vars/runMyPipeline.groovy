@@ -14,19 +14,26 @@ def call() {
                         // Access the Docker image name from the YAML file
                         def dockerImage = yamlData.dockerImage
                         
-                        // Print the Docker image name for demonstration
+                        // Print the Docker image name for demonstration purposes
                         echo "Docker Image: ${dockerImage}"
                         
-                        // Run a Docker container using the specified image
+                        // Define the name of the Docker container
                         def containerName = 'my-container'
-                        sh "docker run -d --name ${containerName} ${dockerImage}"
+                        
+                        // Check if the container is already running
+                        def isContainerRunning = sh(script: "docker ps --filter name=${containerName} --format '{{.Names}}'", returnStatus: true) == 0
+                        
+                        // If the container is not running, start it
+                        if (!isContainerRunning) {
+                            sh "docker run -d --name ${containerName} ${dockerImage}"
+                        }
                         
                         // Execute the jenkin-build script inside the container
                         sh "docker exec ${containerName} ./jenkin-build"
                         
-                        // Stop and remove the container
-                        sh "docker stop ${containerName}"
-                        sh "docker rm ${containerName}"
+                        // Stop and remove the container (optional)
+                        // sh "docker stop ${containerName}"
+                        // sh "docker rm ${containerName}"
                     }
                 }
             }
