@@ -3,21 +3,31 @@
 
 
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.3.3'
-            // Other Docker agent configuration options go here
-        }
-    }
+    agent any
+    
     stages {
-        stage('log version info') {
+        stage('Build and Test') {
             steps {
-                sh 'mvn --version'
-                sh 'mvn clean install'
+                script {
+                    // Pull the desired Docker image (e.g., Ubuntu)
+                    sh 'docker pull ubuntu:latest'
+
+                    // Create and run a Docker container
+                    sh 'docker run -d --name my-container ubuntu:latest'
+                    
+                    // Execute commands inside the Docker container
+                    sh 'docker exec my-container mvn --version'
+                    sh 'docker exec my-container mvn clean install'
+                    
+                    // Stop and remove the Docker container
+                    sh 'docker stop my-container'
+                    sh 'docker rm my-container'
+                }
             }
         }
     }
 }
+
 
 
 
