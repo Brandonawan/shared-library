@@ -9,24 +9,27 @@ pipeline {
         stage('Build and Test') {
             steps {
                 script {
+                    def containerName = "my-container-${new Date().getTime()}"
+                    
                     // Pull the desired Docker image (e.g., Ubuntu)
                     sh 'docker pull ubuntu:latest'
 
-                    // Create and run a Docker container
-                    sh 'docker run -d --name my-container ubuntu:latest'
+                    // Create and run a Docker container with a unique name
+                    sh "docker run -d --name ${containerName} ubuntu:latest"
                     
                     // Execute commands inside the Docker container
-                    sh 'docker exec my-container mvn --version'
-                    sh 'docker exec my-container mvn clean install'
+                    sh "docker exec ${containerName} mvn --version"
+                    sh "docker exec ${containerName} mvn clean install"
                     
                     // Stop and remove the Docker container
-                    sh 'docker stop my-container'
-                    sh 'docker rm my-container'
+                    sh "docker stop ${containerName}"
+                    sh "docker rm ${containerName}"
                 }
             }
         }
     }
 }
+
 
 
 
