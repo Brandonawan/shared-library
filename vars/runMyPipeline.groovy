@@ -28,6 +28,9 @@ def call() {
                             sh "docker run -d --name ${containerName} ${dockerImage}"
                         }
                         
+                        // Wait for a few seconds to ensure the container is up (adjust as needed)
+                        sleep(10)
+                        
                         // Execute the jenkin-build script inside the container
                         sh "docker exec ${containerName} ./jenkin-build"
                         
