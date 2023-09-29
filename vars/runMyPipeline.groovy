@@ -1,41 +1,44 @@
 #!/usr/bin/env groovy
 
-def pipelineConfig = readYaml file: 'pipeline-config.yml'
+def call (){
+    def pipelineConfig = readYaml file: 'pipeline-config.yml'
 
-pipeline {
-    agent {
-        docker {
-            // Use the Docker image name from the YAML file
-            image "${pipelineConfig.dockerImage}"
-            args '--user=root'
-        }
-    }
-
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
+    pipeline {
+        agent {
+            docker {
+                // Use the Docker image name from the YAML file
+                image "${pipelineConfig.dockerImage}"
+                args '--user=root'
             }
         }
 
-        stage('Run Inside Ubuntu Docker Image') {
-            steps {
-                sh 'apt-get update'
-                sh 'apt-get install -y python3-venv python3-pip' // Install Python virtualenv and pip
-                sh 'python3 -m venv venv' // Create a virtual environment
-                sh '. venv/bin/activate' // Activate the virtual environment using dot command
+        stages {
+            stage('Checkout') {
+                steps {
+                    checkout scm
+                }
+            }
 
-                // Install dependencies (if you have a requirements.txt file)
-                sh 'pip install -r requirements.txt'
+            stage('Run Inside Ubuntu Docker Image') {
+                steps {
+                    sh 'apt-get update'
+                    sh 'apt-get install -y python3-venv python3-pip' // Install Python virtualenv and pip
+                    sh 'python3 -m venv venv' // Create a virtual environment
+                    sh '. venv/bin/activate' // Activate the virtual environment using dot command
 
-                // Run tests (adjust the command accordingly)
-                sh 'pytest --junitxml=pytest-results.xml'
+                    // Install dependencies (if you have a requirements.txt file)
+                    sh 'pip install -r requirements.txt'
 
-                // Deactivate the virtual environment using the deactivate function
-                sh 'deactivate || true' // Use '|| true' to ignore errors if deactivate fails
+                    // Run tests (adjust the command accordingly)
+                    sh 'pytest --junitxml=pytest-results.xml'
+
+                    // Deactivate the virtual environment using the deactivate function
+                    sh 'deactivate || true' // Use '|| true' to ignore errors if deactivate fails
+                }
             }
         }
     }
+
 }
 
 
