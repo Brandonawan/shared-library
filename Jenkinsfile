@@ -21,7 +21,7 @@ pipeline {
         stage('Run Inside Ubuntu Docker Image') {
             steps {
                 sh 'apt-get update'
-                sh 'apt-get install -y python3-venv' // Install Python virtualenv
+                sh 'apt-get install -y python3-venv python3-pip' // Install Python virtualenv and pip
                 sh 'python3 -m venv venv' // Create a virtual environment
                 sh '. venv/bin/activate' // Activate the virtual environment using dot command
 
@@ -37,6 +37,7 @@ pipeline {
         }
     }
 }
+
 
 
 
