@@ -45,15 +45,20 @@ def call() {
             stage('Check Files') {
                 steps {
                     script {
-                        def configFileExists = fileExists('pipeline-config.yml')
-                        def buildScriptExists = fileExists('jenkin-build')
+                        def configFile = 'pipeline-config.yml'
+                        def buildScript = 'jenkin-build'
                         
+                        def configFileExists = fileExists(configFile)
+                        def buildScriptExists = fileExists(buildScript)
+                        
+                        echo "Checking File: ${configFile}"
                         if (configFileExists) {
                             echo "pipeline-config.yml exists."
                         } else {
                             error "pipeline-config.yml does not exist."
                         }
                         
+                        echo "Checking File: ${buildScript}"
                         if (buildScriptExists) {
                             echo "jenkin-build script exists."
                         } else {
@@ -91,6 +96,14 @@ def call() {
 
 def fileExists(String fileName) {
     def file = new File("${JENKINS_HOME}/${fileName}")
-    return file.exists()
+    
+    if (file.exists()) {
+        echo "${fileName} exists at ${file.absolutePath}"
+        return true
+    } else {
+        echo "${fileName} does not exist at ${file.absolutePath}"
+        return false
+    }
 }
+
 
