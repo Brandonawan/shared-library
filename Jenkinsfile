@@ -1,34 +1,42 @@
-@Library('pipeline-library-demo')_
-runMyPipeline()
+// @Library('pipeline-library-demo')_
+// runMyPipeline()
 
 
-// pipeline {
-//     agent any
-    
-//     stages {
-//         stage('Build and Test') {
-//             steps {
-//                 script {
-//                     def containerName = "my-container-${new Date().getTime()}"
-                    
-//                     // Pull the desired Docker image (e.g., Ubuntu)
-//                     sh 'docker pull ubuntu:latest'
+pipeline {
+    agent {
+        docker {
+            // Pull the Ubuntu image
+            image 'ubuntu:latest'
+            label 'ubuntu-agent'
+        }
+    }
 
-//                     // Create and run a Docker container with a unique name
-//                     sh "docker run -d --name ${containerName} ubuntu:latest"
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build and Test') {
+            steps {
+                script {
+                    // Set up a virtual environment
+                    sh 'python -m venv venv'
+                    sh 'source venv/bin/activate'
                     
-//                     // Execute commands inside the Docker container
-//                     sh "docker exec ${containerName} mvn --version"
-//                     sh "docker exec ${containerName} mvn clean install"
+                    // Install dependencies
+                    sh 'pip install -r requirements.txt'
                     
-//                     // Stop and remove the Docker container
-//                     sh "docker stop ${containerName}"
-//                     sh "docker rm ${containerName}"
-//                 }
-//             }
-//         }
-//     }
-// }
+                    // Run tests
+                    sh 'pytest --junitxml=pytest-results.xml'
+                }
+                junit 'pytest-results.xml' // Publish test results
+            }
+        }
+    }
+}
+
 
 
 
