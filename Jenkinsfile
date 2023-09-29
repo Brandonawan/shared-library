@@ -3,13 +3,7 @@
 
 
 pipeline {
-    agent {
-        docker {
-            // Pull the Ubuntu image
-            image 'ubuntu:latest'
-            label 'ubuntu-agent'
-        }
-    }
+    agent any
 
     stages {
         stage('Checkout') {
@@ -18,22 +12,34 @@ pipeline {
             }
         }
 
-        stage('Build and Test') {
-            steps {
-                script {
-                    // Set up a virtual environment
-                    sh 'python -m venv venv'
-                    sh 'source venv/bin/activate'
-                    
-                    // Install dependencies
-                    sh 'pip install -r requirements.txt'
-                    
-                    // Run tests
-                    sh 'pytest --junitxml=pytest-results.xml'
+        stage('Run Inside Ubuntu Docker Image') {
+            agent {
+                docker {
+                    // Pull the Ubuntu image
+                    image 'ubuntu:latest'
+                    label 'ubuntu-agent'
                 }
-                junit 'pytest-results.xml' // Publish test results
+            }
+            steps {
+                sh 'apt-get update'
+                sh 'apt-get install -y python3-venv' // Install Python virtualenv
+                sh 'python3 -m venv venv' // Create a virtual environment
+                sh 'source venv/bin/activate' // Activate the virtual environment
+
+                // Install dependencies (if you have a requirements.txt file)
+                sh 'pip install -r requirements.txt'
+
+                // Run tests (adjust the command accordingly)
+                sh 'pytest --junitxml=pytest-results.xml'
+
+                // Deactivate the virtual environment
+                sh 'deactivate'
             }
         }
+    }
+
+    post {
+        // ... (add your post-build actions if needed)
     }
 }
 
