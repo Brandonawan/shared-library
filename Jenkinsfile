@@ -23,7 +23,7 @@ pipeline {
                 sh 'apt-get update'
                 sh 'apt-get install -y python3-venv' // Install Python virtualenv
                 sh 'python3 -m venv venv' // Create a virtual environment
-                sh 'source venv/bin/activate' // Activate the virtual environment
+                sh '. venv/bin/activate' // Activate the virtual environment using dot command
 
                 // Install dependencies (if you have a requirements.txt file)
                 sh 'pip install -r requirements.txt'
@@ -37,6 +37,7 @@ pipeline {
         }
     }
 }
+
 
 
 
