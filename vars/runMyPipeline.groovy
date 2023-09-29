@@ -37,6 +37,8 @@
 // }
 
 
+def configFile = 'pipeline-config.yml'
+
 def call() {
     pipeline {
         agent any
@@ -45,7 +47,6 @@ def call() {
             stage('Check Files') {
                 steps {
                     script {
-                        def configFile = 'pipeline-config.yml'
                         def buildScript = 'jenkin-build'
                         
                         def configFileExists = fileExists(configFile)
@@ -86,6 +87,7 @@ def call() {
             stage('Run jenkin-build Script') {
                 steps {
                     script {
+                        def buildScript = 'jenkin-build'
                         sh "./${buildScript}"
                     }
                 }
@@ -105,4 +107,5 @@ def fileExists(String fileName) {
         return false
     }
 }
+
 
