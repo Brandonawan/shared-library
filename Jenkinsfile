@@ -1,34 +1,34 @@
-// @Library('pipeline-library-demo')_
-// runMyPipeline()
+@Library('pipeline-library-demo')_
+runMyPipeline()
 
 
-pipeline {
-    agent any
+// pipeline {
+//     agent any
     
-    stages {
-        stage('Build and Test') {
-            steps {
-                script {
-                    def containerName = "my-container-${new Date().getTime()}"
+//     stages {
+//         stage('Build and Test') {
+//             steps {
+//                 script {
+//                     def containerName = "my-container-${new Date().getTime()}"
                     
-                    // Pull the desired Docker image (e.g., Ubuntu)
-                    sh 'docker pull ubuntu:latest'
+//                     // Pull the desired Docker image (e.g., Ubuntu)
+//                     sh 'docker pull ubuntu:latest'
 
-                    // Create and run a Docker container with a unique name
-                    sh "docker run -d --name ${containerName} ubuntu:latest"
+//                     // Create and run a Docker container with a unique name
+//                     sh "docker run -d --name ${containerName} ubuntu:latest"
                     
-                    // Execute commands inside the Docker container
-                    sh "docker exec ${containerName} mvn --version"
-                    sh "docker exec ${containerName} mvn clean install"
+//                     // Execute commands inside the Docker container
+//                     sh "docker exec ${containerName} mvn --version"
+//                     sh "docker exec ${containerName} mvn clean install"
                     
-                    // Stop and remove the Docker container
-                    sh "docker stop ${containerName}"
-                    sh "docker rm ${containerName}"
-                }
-            }
-        }
-    }
-}
+//                     // Stop and remove the Docker container
+//                     sh "docker stop ${containerName}"
+//                     sh "docker rm ${containerName}"
+//                 }
+//             }
+//         }
+//     }
+// }
 
 
 
