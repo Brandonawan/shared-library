@@ -17,7 +17,6 @@ pipeline {
                 docker {
                     // Pull the Ubuntu image
                     image 'ubuntu:latest'
-                    label 'ubuntu-agent'
                 }
             }
             steps {
