@@ -31,21 +31,26 @@ def call() {
                             }
                         }
 
-                        // Update package lists and install packages with sudo
-                        sh 'sudo apt-get update'
-                        sh 'sudo apt-get install -y python3-venv python3-pip'
-                        sh 'python3 -m venv venv'
-                        sh '. venv/bin/activate'
+                        // The rest of your pipeline steps remain the same
+                        sh 'apt-get update'
+                        sh 'apt-get install -y python3-venv python3-pip' // Install Python virtualenv and pip
+                        sh 'python3 -m venv venv' // Create a virtual environment
+                        sh '. venv/bin/activate' // Activate the virtual environment using dot command
+
+                        // Install dependencies (if you have a requirements.txt file)
                         sh 'pip install -r requirements.txt'
+
+                        // Run tests (adjust the command accordingly)
                         sh 'pytest --junitxml=pytest-results.xml'
-                        sh 'deactivate || true'
+
+                        // Deactivate the virtual environment using the deactivate function
+                        sh 'deactivate || true' // Use '|| true' to ignore errors if deactivate fails
                     }
                 }
             }
         }
     }
 }
-
 
 // def call() {
 //         pipeline {
