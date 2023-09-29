@@ -37,10 +37,6 @@ pipeline {
             }
         }
     }
-
-    post {
-        // ... (add your post-build actions if needed)
-    }
 }
 
 
