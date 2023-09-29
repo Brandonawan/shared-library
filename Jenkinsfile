@@ -15,8 +15,10 @@ pipeline {
         stage('Run Inside Ubuntu Docker Image') {
             agent {
                 docker {
-                    // Pull the Ubuntu image
+                    // Pull the Ubuntu image and use privileged mode
                     image 'ubuntu:latest'
+                    label 'ubuntu-agent'
+                    args '--privileged'
                 }
             }
             steps {
@@ -37,9 +39,6 @@ pipeline {
         }
     }
 }
-
-
-
 
 
 
