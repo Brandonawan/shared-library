@@ -17,7 +17,6 @@ pipeline {
                 docker {
                     // Pull the Ubuntu image and use privileged mode
                     image 'ubuntu:latest'
-                    label 'ubuntu-agent'
                     args '--privileged'
                 }
             }
