@@ -31,8 +31,8 @@ pipeline {
                 // Run tests (adjust the command accordingly)
                 sh 'pytest --junitxml=pytest-results.xml'
 
-                // Deactivate the virtual environment
-                sh 'deactivate'
+                // Deactivate the virtual environment using the deactivate function
+                sh 'deactivate || true' // Use '|| true' to ignore errors if deactivate fails
             }
         }
     }
