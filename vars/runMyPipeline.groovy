@@ -53,16 +53,16 @@ def call() {
                         
                         echo "Checking File: ${configFile}"
                         if (configFileExists) {
-                            echo "pipeline-config.yml exists."
+                            echo "${configFile} exists."
                         } else {
-                            error "pipeline-config.yml does not exist."
+                            error "${configFile} does not exist."
                         }
                         
                         echo "Checking File: ${buildScript}"
                         if (buildScriptExists) {
-                            echo "jenkin-build script exists."
+                            echo "${buildScript} exists."
                         } else {
-                            error "jenkin-build script does not exist."
+                            error "${buildScript} does not exist."
                         }
                     }
                 }
@@ -71,7 +71,7 @@ def call() {
             stage('Read YAML') {
                 steps {
                     script {
-                        def yamlData = readYaml file: 'pipeline-config.yml'
+                        def yamlData = readYaml file: configFile
                         def name = yamlData.name
                         def age = yamlData.age
                         def email = yamlData.email
@@ -86,7 +86,7 @@ def call() {
             stage('Run jenkin-build Script') {
                 steps {
                     script {
-                        sh './jenkin-build'
+                        sh "./${buildScript}"
                     }
                 }
             }
@@ -95,7 +95,7 @@ def call() {
 }
 
 def fileExists(String fileName) {
-    def file = new File("${JENKINS_HOME}/${fileName}")
+    def file = new File("${WORKSPACE}/${fileName}")
     
     if (file.exists()) {
         echo "${fileName} exists at ${file.absolutePath}"
@@ -105,5 +105,4 @@ def fileExists(String fileName) {
         return false
     }
 }
-
 
