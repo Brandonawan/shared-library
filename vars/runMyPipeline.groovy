@@ -1,5 +1,39 @@
 #!/usr/bin/env groovy
 
+def call() {
+    pipeline {
+        agent any
+
+        stages {
+            stage('Read YAML') {
+                steps {
+                    script {
+                        // Define yamlData within the script block
+                        def yamlData = readYaml file: 'pipeline-config.yml'
+                        
+                        // Access the Docker image name from the YAML file
+                        def dockerImage = yamlData.dockerImage
+                        
+                        // Print the Docker image name for demonstration
+                        echo "Docker Image: ${dockerImage}"
+                        
+                        // Run a Docker container using the specified image
+                        def containerName = 'my-container'
+                        sh "docker run -d --name ${containerName} ${dockerImage}"
+                        
+                        // Execute the jenkin-build script inside the container
+                        sh "docker exec ${containerName} ./jenkin-build"
+                        
+                        // Stop and remove the container
+                        sh "docker stop ${containerName}"
+                        sh "docker rm ${containerName}"
+                    }
+                }
+            }
+        }
+    }
+}
+
 // def call() {
 //     pipeline {
 //         agent any
@@ -37,75 +71,6 @@
 // }
 
 
-def configFile = 'pipeline-config.yml'
 
-def call() {
-    pipeline {
-        agent any
-
-        stages {
-            stage('Check Files') {
-                steps {
-                    script {
-                        def buildScript = 'jenkin-build'
-                        
-                        def configFileExists = fileExists(configFile)
-                        def buildScriptExists = fileExists(buildScript)
-                        
-                        echo "Checking File: ${configFile}"
-                        if (configFileExists) {
-                            echo "${configFile} exists."
-                        } else {
-                            error "${configFile} does not exist."
-                        }
-                        
-                        echo "Checking File: ${buildScript}"
-                        if (buildScriptExists) {
-                            echo "${buildScript} exists."
-                        } else {
-                            error "${buildScript} does not exist."
-                        }
-                    }
-                }
-            }
-
-            stage('Read YAML') {
-                steps {
-                    script {
-                        def yamlData = readYaml file: configFile
-                        def name = yamlData.name
-                        def age = yamlData.age
-                        def email = yamlData.email
-                        
-                        echo "Name: ${name}"
-                        echo "Age: ${age}"
-                        echo "Email: ${email}"
-                    }
-                }
-            }
-
-            stage('Run jenkin-build Script') {
-                steps {
-                    script {
-                        def buildScript = 'jenkin-build'
-                        sh "./${buildScript}"
-                    }
-                }
-            }
-        }
-    }
-}
-
-def fileExists(String fileName) {
-    def file = new File("${WORKSPACE}/${fileName}")
-    
-    if (file.exists()) {
-        echo "${fileName} exists at ${file.absolutePath}"
-        return true
-    } else {
-        echo "${fileName} does not exist at ${file.absolutePath}"
-        return false
-    }
-}
 
 
