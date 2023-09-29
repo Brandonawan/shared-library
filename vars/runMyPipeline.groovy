@@ -5,44 +5,50 @@ def call() {
         agent any
 
         stages {
-            stage('Read YAML') {
+            stage('Read YAML and Run Docker Container') {
                 steps {
                     script {
-                        // Define yamlData within the script block
-                        def yamlData = readYaml file: 'pipeline-config.yml'
-                        
-                        // Access the Docker image name from the YAML file
-                        def dockerImage = yamlData.dockerImage
-                        
-                        // Print the Docker image name for demonstration purposes
-                        echo "Docker Image: ${dockerImage}"
-                        
                         // Define the name of the Docker container
                         def containerName = 'my-container'
                         
-                        // Check if the container is already running
-                        def isContainerRunning = sh(script: "docker ps --filter name=${containerName} --format '{{.Names}}'", returnStatus: true) == 0
-                        
-                        // If the container is not running, start it
-                        if (!isContainerRunning) {
-                            sh "docker run -d --name ${containerName} ${dockerImage}"
+                        try {
+                            // Define yamlData within the script block
+                            def yamlData = readYaml file: 'pipeline-config.yml'
+                            
+                            // Access the Docker image name from the YAML file
+                            def dockerImage = yamlData.dockerImage
+                            
+                            // Print the Docker image name for demonstration purposes
+                            echo "Docker Image: ${dockerImage}"
+                            
+                            // Check if the container is already running
+                            def isContainerRunning = sh(script: "docker ps --filter name=${containerName} --format '{{.Names}}'", returnStatus: true) == 0
+                            
+                            // If the container is not running, start it
+                            if (!isContainerRunning) {
+                                sh "docker run -d --name ${containerName} ${dockerImage}"
+                                
+                                // Wait for the container to be up and running (adjust as needed)
+                                sh "docker wait ${containerName}"
+                            }
+                            
+                            // Execute the jenkin-build script inside the container
+                            sh "docker exec ${containerName} ./jenkin-build"
+                        } catch (Exception e) {
+                            currentBuild.result = 'FAILURE'
+                            error("An error occurred: ${e.message}")
+                        } finally {
+                            // Optionally, stop and remove the container
+                            sh "docker stop ${containerName}"
+                            sh "docker rm ${containerName}"
                         }
-                        
-                        // Wait for a few seconds to ensure the container is up (adjust as needed)
-                        sleep(10)
-                        
-                        // Execute the jenkin-build script inside the container
-                        sh "docker exec ${containerName} ./jenkin-build"
-                        
-                        // Stop and remove the container (optional)
-                        // sh "docker stop ${containerName}"
-                        // sh "docker rm ${containerName}"
                     }
                 }
             }
         }
     }
 }
+
 
 // def call() {
 //     pipeline {
