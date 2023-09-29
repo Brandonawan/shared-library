@@ -90,5 +90,7 @@ def call() {
 }
 
 def fileExists(String fileName) {
-    return fileExists("${JENKINS_HOME}/${fileName}")
+    def file = new File("${JENKINS_HOME}/${fileName}")
+    return file.exists()
 }
+
