@@ -1,8 +1,17 @@
 #!/usr/bin/env groovy
 
 def call() {
+    def pipelineConfig = readYaml file: 'pipeline-config.yml'
+    def dockerImage = pipelineConfig.dockerImage ?: 'ubuntu:latest' // Use 'ubuntu:latest' as default if not specified in the YAML
+
     pipeline {
-        agent any
+        agent {
+            docker {
+                // Use the Docker image name from the YAML file or 'ubuntu:latest' as default
+                image dockerImage
+                args '--user=root'
+            }
+        }
 
         stages {
             stage('Checkout') {
@@ -13,42 +22,20 @@ def call() {
 
             stage('Run Inside Ubuntu Docker Image') {
                 steps {
-                    script {
-                        def pipelineConfig = readYaml file: 'pipeline-config.yml'
+                    sh 'apt-get update'
+                    sh 'apt-get install -y python3-venv python3-pip' // Install Python virtualenv and pip
+                    sh 'python3 -m venv venv' // Create a virtual environment
+                    sh '. venv/bin/activate' // Activate the virtual environment using the dot command
 
-                        // Ensure the dockerImage key exists in the YAML file
-                        def dockerImage = pipelineConfig.dockerImage
+                    // Install dependencies (if you have a requirements.txt file)
+                    sh 'pip install -r requirements.txt'
 
-                        if (dockerImage) {
-                            // Use the Docker image name from the YAML file
-                            docker.image(dockerImage).withRun('--user=root') {
-                                sh 'apt-get update'
-                                sh 'apt-get install -y python3-venv python3-pip' // Install Python virtualenv and pip
-                                sh 'python3 -m venv venv' // Create a virtual environment
-                                sh 'source venv/bin/activate' // Activate the virtual environment
+                    // Run tests (adjust the command accordingly)
+                    sh 'pytest --junitxml=pytest-results.xml'
 
-                                // Install dependencies (if you have a requirements.txt file)
-                                sh 'pip install -r requirements.txt'
-
-                                // Run tests (adjust the command accordingly)
-                                sh 'pytest --junitxml=pytest-results.xml'
-
-                                // Exit the shell session to leave the virtual environment
-                                sh 'exit'
-                            }
-                        } else {
-                            error('Docker image not specified in pipeline-config.yml')
-                        }
-                    }
+                    // Deactivate the virtual environment using the deactivate function
+                    sh 'deactivate || true' // Use '|| true' to ignore errors if deactivate fails
                 }
-            }
-
-        }
-
-        post {
-            always {
-                // Deactivate the virtual environment using the deactivate function
-                sh 'deactivate || true' // Use '|| true' to ignore errors if deactivate fails
             }
         }
     }
