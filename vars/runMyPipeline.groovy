@@ -32,6 +32,9 @@ def call() {
 
                                 // Run tests (adjust the command accordingly)
                                 sh 'pytest --junitxml=pytest-results.xml'
+
+                                // Exit the shell session to leave the virtual environment
+                                sh 'exit'
                             }
                         } else {
                             error('Docker image not specified in pipeline-config.yml')
@@ -39,6 +42,7 @@ def call() {
                     }
                 }
             }
+
         }
 
         post {
