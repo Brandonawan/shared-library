@@ -21,7 +21,7 @@ def call() {
 
                         if (dockerImage) {
                             // Use the Docker image name from the YAML file
-                            docker.image(dockerImage).withRun('--user=root', '--privileged=true') {
+                            docker.image(dockerImage).withRun('--user=root') {
                                 sh 'apt-get update'
                                 sh 'apt-get install -y python3-venv python3-pip' // Install Python virtualenv and pip
                                 sh 'python3 -m venv venv' // Create a virtual environment
@@ -53,7 +53,6 @@ def call() {
         }
     }
 }
-
 
 
 
