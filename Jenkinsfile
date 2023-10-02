@@ -1,5 +1,43 @@
-@Library('pipeline-library-demo')_
-runMyPipeline()
+// @Library('pipeline-library-demo')_
+// runMyPipeline()
+
+
+pipeline {
+    agent any
+
+    environment {
+        // Define the repository URL and the branch you want to check
+        REPO_URL = 'https://github.com/Brandonawan/shared-library.git'
+        BRANCH_NAME = 'main'
+        FILE_TO_CHECK = 'push.sh' // Specify the path to the file you want to check
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    // Checkout the repository
+                    checkout([$class: 'GitSCM', branches: [[name: BRANCH_NAME]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'your-git-credentials-id', url: REPO_URL]]])
+                }
+            }
+        }
+
+        stage('Check File') {
+            steps {
+                script {
+                    // Check if the specified file exists
+                    def fileExists = fileExists(FILE_TO_CHECK)
+
+                    if (fileExists) {
+                        echo "File '$FILE_TO_CHECK' exists in the repository."
+                    } else {
+                        error "File '$FILE_TO_CHECK' does not exist in the repository."
+                    }
+                }
+            }
+        }
+    }
+}
 
 // pipeline {
 //     agent {
