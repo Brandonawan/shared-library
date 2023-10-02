@@ -9,6 +9,7 @@ def call() {
             stage('Validation and Setup') {
                 steps {
                     script {
+                        sh 'pwd'
                         // Validate pipeline-config.yml
                         dockerConfig = readYaml file: 'pipeline-config.yml' // Assign to the higher scope variable
                         validateDockerConfig(dockerConfig)
