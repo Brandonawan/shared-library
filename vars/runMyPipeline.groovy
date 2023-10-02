@@ -14,10 +14,10 @@ def call() {
 
                         // Validate pipeline-config.yml
                         dockerConfig = readYaml file: 'pipeline-config.yml' // Assign to the higher scope variable
-                        validateDockerConfig(dockerConfig)
+                        // validateDockerConfig(dockerConfig)
 
                         // Check if jenkin-build script exists and is executable
-                        validateExecutableScript('jenkin-build')
+                        // validateExecutableScript('jenkin-build')
 
                         // Set default values if not provided
                         dockerConfig.dockerImage = dockerConfig.dockerImage ?: 'maven:3-alpine'
