@@ -2,47 +2,121 @@
 // runMyPipeline()
 
 
-pipeline {
-    agent any
-
-    environment {
-        // Define the repository URL and the branch you want to check
-        REPO_URL = 'https://github.com/Brandonawan/shared-library.git'
-        BRANCH_NAME = 'main'
-        FILE_TO_CHECK = 'jenkin-buildss' // Specify the path to the file you want to check
-    }
-
-    stages {
-        stage('Checkout') {
-            steps {
-                script {
-                    // Checkout the repository
-                    checkout([$class: 'GitSCM', branches: [[name: BRANCH_NAME]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'your-git-credentials-id', url: REPO_URL]]])
+// Define a function to check files and run the pipeline
+def call() {
+    pipeline {
+        agent any
+        stages {
+            stage('Checkout') {
+                steps {
+                    checkout scm
                 }
             }
-        }
-        stage('Check Workspace Contents') {
-            steps {
-                sh 'ls -l' // List the contents of the workspace
-            }
-        }
-
-        stage('Check File') {
-            steps {
-                script {
-                    // Check if the specified file exists
-                    def fileExists = fileExists(FILE_TO_CHECK)
-
-                    if (fileExists) {
-                        echo "File '$FILE_TO_CHECK' exists in the repository."
-                    } else {
-                        error "File '$FILE_TO_CHECK' does not exist in the repository."
+            
+            stage('Check Files') {
+                steps {
+                    script {
+                        checkFileExists('jenkin-build')
+                        checkFileExists('pipeline-config.yml')
                     }
+                }
+            }
+
+            stage('Read Docker Image Name') {
+                steps {
+                    script {
+                        def dockerConfig = readYaml file: 'pipeline-config.yml'
+                        def dockerImage = dockerConfig.dockerImage
+
+                        // Set the Docker image name as an environment variable
+                        env.DOCKER_IMAGE = dockerImage
+                    }
+                }
+            }
+
+            stage('Run Inside Docker Image') {
+                agent {
+                    docker {
+                        image "${env.DOCKER_IMAGE}"
+                        args '--user=root'
+                    }
+                }
+                steps {
+                    sh 'apt-get update'
+                    sh 'apt-get install -y python3-venv python3-pip' // Install Python virtualenv and pip
+                    sh 'python3 -m venv venv' // Create a virtual environment
+                    sh '. venv/bin/activate' // Activate the virtual environment using the dot command
+
+                    // Install dependencies (if you have a requirements.txt file)
+                    sh 'pip install -r requirements.txt'
+
+                    // Run tests (adjust the command accordingly)
+                    sh 'pytest --junitxml=pytest-results.xml'
+
+                    // Deactivate the virtual environment using the deactivate function
+                    sh 'deactivate || true' // Use '|| true' to ignore errors if deactivate fails
+                }
+            }
+
+            stage('Deliver') {
+                steps {
+                    sh './jenkin-build'
                 }
             }
         }
     }
 }
+
+// Define a function to check if a file exists
+def checkFileExists(fileName) {
+    def fileExists = fileExists(fileName)
+    if (!fileExists) {
+        error "File '${fileName}' not found in the repository."
+    }
+}
+
+
+// pipeline {
+//     agent any
+
+//     environment {
+//         // Define the repository URL and the branch you want to check
+//         REPO_URL = 'https://github.com/Brandonawan/shared-library.git'
+//         BRANCH_NAME = 'main'
+//         FILE_TO_CHECK = 'jenkin-buildss' // Specify the path to the file you want to check
+//     }
+
+//     stages {
+//         stage('Checkout') {
+//             steps {
+//                 script {
+//                     // Checkout the repository
+//                     checkout([$class: 'GitSCM', branches: [[name: BRANCH_NAME]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'your-git-credentials-id', url: REPO_URL]]])
+//                 }
+//             }
+//         }
+//         stage('Check Workspace Contents') {
+//             steps {
+//                 sh 'ls -l' // List the contents of the workspace
+//             }
+//         }
+
+//         stage('Check File') {
+//             steps {
+//                 script {
+//                     // Check if the specified file exists
+//                     def fileExists = fileExists(FILE_TO_CHECK)
+
+//                     if (fileExists) {
+//                         echo "File '$FILE_TO_CHECK' exists in the repository."
+//                     } else {
+//                         error "File '$FILE_TO_CHECK' does not exist in the repository."
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
 
 // pipeline {
 //     agent {
