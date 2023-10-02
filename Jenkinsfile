@@ -9,7 +9,7 @@ pipeline {
         // Define the repository URL and the branch you want to check
         REPO_URL = 'https://github.com/Brandonawan/shared-library.git'
         BRANCH_NAME = 'main'
-        FILE_TO_CHECK = 'push.sh' // Specify the path to the file you want to check
+        FILE_TO_CHECK = 'jenkin-build' // Specify the path to the file you want to check
     }
 
     stages {
