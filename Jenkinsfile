@@ -21,6 +21,11 @@ pipeline {
                 }
             }
         }
+        stage('Check Workspace Contents') {
+            steps {
+                sh 'ls -l' // List the contents of the workspace
+            }
+        }
 
         stage('Check File') {
             steps {
