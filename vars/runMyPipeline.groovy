@@ -14,7 +14,7 @@ def call() {
             stage('Check Files') {
                 steps {
                     script {
-                        checkExecutableFile('testExecutable.sh')
+                        checkFileExists('jenkin-build')
                         checkFileExists('pipeline-config.yml')
                     }
                 }
@@ -65,17 +65,13 @@ def call() {
     }
 }
 
-// Define a function to check if a file exists and is executable
-def checkExecutableFile(fileName) {
-    def file = new File(fileName)
-    if (!file.exists()) {
+// Define a function to check if a file exists
+def checkFileExists(fileName) {
+    def fileExists = fileExists(fileName)
+    if (!fileExists) {
         error "File '${fileName}' not found in the repository."
     }
-    if (!file.canExecute()) {
-        error "File '${fileName}' is not executable."
-    }
 }
-
 
 
 
