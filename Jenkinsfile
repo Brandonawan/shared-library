@@ -1,10 +1,5 @@
-// @Library('pipeline-library-demo')_
-// runMyPipeline()
-
-
-
-@Library('pipeline-library-demo') // Reference your shared library
-
+@Library('pipeline-library-demo')_
+runMyPipeline()
 
 // pipeline {
 //     agent {
