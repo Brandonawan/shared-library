@@ -14,7 +14,7 @@ def call() {
 
                         // Validate pipeline-config.yml
                         dockerConfig = readYaml file: 'pipeline-config.yml' // Assign to the higher scope variable
-                        validateDockerConfig("${WORKSPACE}/${env.JOB_NAME}/dockerConfig")
+                        validateDockerConfig('dockerConfig')
 
                         // Check if jenkin-build script exists and is executable
                         validateExecutableScript("${WORKSPACE}/${env.JOB_NAME}/jenkin-build")
