@@ -14,7 +14,7 @@ def call() {
             stage('Check Files') {
                 steps {
                     script {
-                        checkExecutableFile('jenkin-build')
+                        checkExecutableFile('testExecutable.sh')
                         checkFileExists('pipeline-config.yml')
                     }
                 }
