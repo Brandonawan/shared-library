@@ -11,6 +11,14 @@ def call() {
                 }
             }
             
+            stage('Create Non-Executable File') {
+                steps {
+                    script {
+                        writeFile file: 'jenkin-build', text: 'This is a non-executable file content'
+                    }
+                }
+            }
+
             stage('Check Files') {
                 steps {
                     script {
