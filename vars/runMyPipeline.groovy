@@ -7,6 +7,22 @@ def call() {
         agent any
         stages {
             stage('Validation and Setup') {
+                // steps {
+                //     script {
+                //         sh 'pwd'  // Print the current working directory (CWD)
+                //         sh 'ls -la'  // List all files and their permissions in the current directory
+
+                //         // Validate pipeline-config.yml
+                //         dockerConfig = readYaml file: 'pipeline-config.yml' // Assign to the higher scope variable
+                //         // validateDockerConfig(dockerConfig)
+
+                //         // Check if jenkin-build script exists and is executable
+                //         // validateExecutableScript('jenkin-build')
+
+                //         // Set default values if not provided
+                //         dockerConfig.dockerImage = dockerConfig.dockerImage ?: 'maven:3-alpine'
+                //     }
+                // }
                 steps {
                     script {
                         sh 'pwd'  // Print the current working directory (CWD)
@@ -17,7 +33,18 @@ def call() {
                         // validateDockerConfig(dockerConfig)
 
                         // Check if jenkin-build script exists and is executable
-                        // validateExecutableScript('jenkin-build')
+                        echo "Checking for jenkin-build script..."
+                        def scriptName = 'jenkin-build'
+                        if (fileExists(scriptName)) {
+                            echo "${scriptName} script found."
+                            if (isScriptExecutable(scriptName)) {
+                                echo "${scriptName} script is executable."
+                            } else {
+                                error("${scriptName} script is not executable. Make sure to run 'chmod +x ${scriptName}' before committing.")
+                            }
+                        } else {
+                            error("${scriptName} script is missing in the repository.")
+                        }
 
                         // Set default values if not provided
                         dockerConfig.dockerImage = dockerConfig.dockerImage ?: 'maven:3-alpine'
