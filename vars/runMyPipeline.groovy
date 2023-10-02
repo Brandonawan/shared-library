@@ -9,7 +9,9 @@ def call() {
             stage('Validation and Setup') {
                 steps {
                     script {
-                        sh 'pwd'
+                        sh 'pwd'  // Print the current working directory (CWD)
+                        sh 'ls -la'  // List all files and their permissions in the current directory
+
                         // Validate pipeline-config.yml
                         dockerConfig = readYaml file: 'pipeline-config.yml' // Assign to the higher scope variable
                         validateDockerConfig(dockerConfig)
@@ -75,6 +77,7 @@ def validateDockerConfig(config) {
 }
 
 def validateExecutableScript(scriptName) {
+    sh 'ls -la'  // List all files and their permissions in the current directory before checking the script
     if (!fileExists(scriptName)) {
         error("${scriptName} script is missing in the repository.")
     }
@@ -91,6 +94,7 @@ def fileExists(fileName) {
 def isScriptExecutable(scriptName) {
     return new File(scriptName).canExecute()
 }
+
 
 
 // def call() {
