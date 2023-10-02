@@ -6,6 +6,7 @@ def call() {
         stages {
             stage('Validation and Setup') {
                 steps {
+                    sh 'pwd'
                     script {
                         // Validate pipeline-config.yml
                         def dockerConfig = readYaml file: 'pipeline-config.yml'
