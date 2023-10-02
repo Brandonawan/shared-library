@@ -1,34 +1,37 @@
 #!/usr/bin/env groovy
-def config = readYaml file: 'pipeline-config.yml'
-
-def dockerImage = config.dockerImage ?: 'ubuntu:latest'
-
-pipeline {
-    agent {
-        docker {
-            // Pull the Docker image from the YAML file or use the default 'ubuntu:latest'
-            image dockerImage
-            args '--user=root'
-        }
-    }
-
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
+def call() {
+    pipeline {
+        agent {
+            docker {
+                // Read the Docker image value from the pipeline-config.yml file
+                image readFile('pipeline-config.yml')['dockerImage']
+                args '--user=root'
             }
         }
 
-        stage('Run Inside Docker Image') {
-            steps {
-                sh 'apt-get update'
-                sh 'apt-get install -y python3-venv python3-pip'
-                sh 'python3 -m venv venv'
-                sh '. venv/bin/activate'
+        stages {
+            stage('Checkout') {
+                steps {
+                    checkout scm
+                }
+            }
 
-                sh 'pip install -r requirements.txt'
-                sh 'pytest --junitxml=pytest-results.xml'
-                sh 'deactivate || true'
+            stage('Run Inside Ubuntu Docker Image') {
+                steps {
+                    sh 'apt-get update'
+                    sh 'apt-get install -y python3-venv python3-pip' // Install Python virtualenv and pip
+                    sh 'python3 -m venv venv' // Create a virtual environment
+                    sh '. venv/bin/activate' // Activate the virtual environment using dot command
+
+                    // Install dependencies (if you have a requirements.txt file)
+                    sh 'pip install -r requirements.txt'
+
+                    // Run tests (adjust the command accordingly)
+                    sh 'pytest --junitxml=pytest-results.xml'
+
+                    // Deactivate the virtual environment using the deactivate function
+                    sh 'deactivate || true' // Use '|| true' to ignore errors if deactivate fails
+                }
             }
         }
     }
