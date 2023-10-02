@@ -16,6 +16,9 @@ def call() {
                     script {
                         checkFileExists('jenkin-build')
                         checkFileExists('pipeline-config.yml')
+
+                        // Check if jenkin-build is executable
+                        checkIfJenkinBuildIsExecutable()
                     }
                 }
             }
@@ -71,6 +74,17 @@ def checkFileExists(fileName) {
     if (!fileExists) {
         error "File '${fileName}' not found in the repository."
     }
+
+// Define a function to check if jenkin-build is executable
+def checkIfJenkinBuildIsExecutable() {
+    script {
+        def isExecutable = fileExists('jenkin-build') && isExecutable('jenkin-build')
+        if (!isExecutable) {
+            error "The 'jenkin-build' file is either not found or not executable."
+        }
+    }
+}
+
 }
 
 
