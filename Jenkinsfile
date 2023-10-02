@@ -5,19 +5,6 @@
 
 @Library('pipeline-library-demo') // Reference your shared library
 
-pipeline {
-    agent any
-
-    stages {
-        stage('Example') {
-            steps {
-                // You don't need to call any functions here
-                // The setup function will be executed automatically
-            }
-        }
-    }
-}
-
 
 // pipeline {
 //     agent {
