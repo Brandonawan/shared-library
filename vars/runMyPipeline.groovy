@@ -1,39 +1,38 @@
 #!/usr/bin/env groovy
 
-
 def call() {
-        pipeline {
-        agent any // Use 'any' agent to run the pipeline on any available agent
+  pipeline {
+    agent any
 
-        stages {
-            stage('Run Inside Ubuntu Docker Image') {
-                steps {
-                    script {
-                        // Pull the Ubuntu image and run as root user
-                        docker.image('ubuntu:latest').withRun('--user=root -v /var/lib/apt/lists:/var/lib/apt/lists') { c ->
-                            // Inside the Docker container
+    stages {
+      stage('Run Inside Ubuntu Docker Image') {
+        steps {
+          script {
+            // Pull the Ubuntu image and run as the apt user, mounting the /var/lib/apt/lists directory
+            docker.image('ubuntu:latest').withRun('--user=apt -v /var/lib/apt/lists:/var/lib/apt/lists') { c ->
+              // Inside the Docker container
 
-                            // Update and install necessary packages
-                            sh 'apt-get update'
-                            sh 'apt-get install -y python3-venv python3-pip'
+              // Update and install necessary packages
+              sh 'apt-get update'
+              sh 'apt-get install -y python3-venv python3-pip'
 
-                            // Create and activate a virtual environment
-                            sh 'python3 -m venv venv'
-                            sh '. venv/bin/activate'
+              // Create and activate a virtual environment
+              sh 'python3 -m venv venv'
+              sh '. venv/bin/activate'
 
-                            // If you have a requirements.txt file, install dependencies
-                            sh 'pip install -r requirements.txt'
+              // If you have a requirements.txt file, install dependencies
+              sh 'pip install -r requirements.txt'
 
-                            // Run tests (adjust the command accordingly)
-                            sh 'pytest --junitxml=pytest-results.xml'
-                        }
-                    }
-                }
+              // Run tests (adjust the command accordingly)
+              sh 'pytest --junitxml=pytest-results.xml'
             }
+          }
         }
+      }
     }
-
+  }
 }
+
 // def call() {
 //         pipeline {
 //         agent {
