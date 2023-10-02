@@ -79,12 +79,17 @@ def checkFileExists(fileName) {
 // Define a function to check if jenkin-build is executable
 def checkIfJenkinBuildIsExecutable() {
     script {
-        def file = file('jenkin-build')
-        if (!file.exists() || !file.canExecute()) {
-            error "The 'jenkin-build' file is either not found or not executable."
+        if (!fileExists('jenkin-build')) {
+            error "The 'jenkin-build' file is not found in the repository."
+        }
+
+        def isExecutable = sh(script: "test -x jenkin-build", returnStatus: true)
+        if (isExecutable != 0) {
+            error "The 'jenkin-build' file is not executable."
         }
     }
 }
+
 
 
 
