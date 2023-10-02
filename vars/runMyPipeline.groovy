@@ -1,20 +1,21 @@
 #!/usr/bin/env groovy
 
+def dockerConfig // Declare dockerConfig at a higher scope
+
 def call() {
     pipeline {
         agent any
         stages {
             stage('Validation and Setup') {
                 steps {
-                    sh 'pwd'
                     script {
                         // Validate pipeline-config.yml
-                        def dockerConfig = readYaml file: 'pipeline-config.yml'
+                        dockerConfig = readYaml file: 'pipeline-config.yml' // Assign to the higher scope variable
                         validateDockerConfig(dockerConfig)
 
                         // Check if jenkin-build script exists and is executable
                         validateExecutableScript('jenkin-build')
-                        
+
                         // Set default values if not provided
                         dockerConfig.dockerImage = dockerConfig.dockerImage ?: 'maven:3-alpine'
                     }
@@ -38,7 +39,7 @@ def call() {
                     sh 'apt-get update'
                     sh 'apt-get install -y python3-venv python3-pip' // Install Python virtualenv and pip
                     sh 'python3 -m venv venv' // Create a virtual environment
-                    sh '. venv/bin/activate' // Activate the virtual environment using dot command
+                    sh '. venv/bin/activate' // Activate the virtual environment using the dot command
 
                     // Install dependencies (if you have a requirements.txt file)
                     sh 'pip install -r requirements.txt'
@@ -64,11 +65,11 @@ def validateDockerConfig(config) {
     if (!config) {
         error("pipeline-config.yml is missing or empty.")
     }
-    
+
     if (!config.dockerImage) {
         error("Docker image name is missing in pipeline-config.yml.")
     }
-    
+
     // Add more validation checks as needed
 }
 
@@ -76,7 +77,7 @@ def validateExecutableScript(scriptName) {
     if (!fileExists(scriptName)) {
         error("${scriptName} script is missing in the repository.")
     }
-    
+
     if (!isScriptExecutable(scriptName)) {
         error("${scriptName} script is not executable. Make sure to run 'chmod +x ${scriptName}' before committing.")
     }
@@ -89,6 +90,7 @@ def fileExists(fileName) {
 def isScriptExecutable(scriptName) {
     return new File(scriptName).canExecute()
 }
+
 
 // def call() {
 //     pipeline {
