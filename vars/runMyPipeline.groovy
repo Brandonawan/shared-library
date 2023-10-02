@@ -10,7 +10,7 @@ def call() {
                 steps {
                     script {
                         // Pull the Ubuntu image and run as root user
-                        docker.image('ubuntu:latest').withRun('--user=root') { c ->
+                        docker.image('ubuntu:latest').withRun('--user=root -v /var/lib/apt/lists:/var/lib/apt/lists') { c ->
                             // Inside the Docker container
 
                             // Update and install necessary packages
