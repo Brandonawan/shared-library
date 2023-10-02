@@ -1,42 +1,39 @@
 #!/usr/bin/env groovy
+
+
 def call() {
-    pipeline {
-        agent {
-            docker {
-                // Read the Docker image value from the pipeline-config.yml file
-                image readFile('pipeline-config.yml')['dockerImage']
-                args '--user=root'
-            }
-        }
+        pipeline {
+        agent any // Use 'any' agent to run the pipeline on any available agent
 
         stages {
-            stage('Checkout') {
-                steps {
-                    checkout scm
-                }
-            }
-
             stage('Run Inside Ubuntu Docker Image') {
                 steps {
-                    sh 'apt-get update'
-                    sh 'apt-get install -y python3-venv python3-pip' // Install Python virtualenv and pip
-                    sh 'python3 -m venv venv' // Create a virtual environment
-                    sh '. venv/bin/activate' // Activate the virtual environment using dot command
+                    script {
+                        // Pull the Ubuntu image and run as root user
+                        docker.image('ubuntu:latest').withRun('--user=root') { c ->
+                            // Inside the Docker container
 
-                    // Install dependencies (if you have a requirements.txt file)
-                    sh 'pip install -r requirements.txt'
+                            // Update and install necessary packages
+                            sh 'apt-get update'
+                            sh 'apt-get install -y python3-venv python3-pip'
 
-                    // Run tests (adjust the command accordingly)
-                    sh 'pytest --junitxml=pytest-results.xml'
+                            // Create and activate a virtual environment
+                            sh 'python3 -m venv venv'
+                            sh '. venv/bin/activate'
 
-                    // Deactivate the virtual environment using the deactivate function
-                    sh 'deactivate || true' // Use '|| true' to ignore errors if deactivate fails
+                            // If you have a requirements.txt file, install dependencies
+                            sh 'pip install -r requirements.txt'
+
+                            // Run tests (adjust the command accordingly)
+                            sh 'pytest --junitxml=pytest-results.xml'
+                        }
+                    }
                 }
             }
         }
     }
-}
 
+}
 // def call() {
 //         pipeline {
 //         agent {
