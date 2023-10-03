@@ -1,5 +1,5 @@
 # dockerImage: artifacts-bxdsw.sc.intel.com:9444/mev/fedora:30
-dockerImage: ubuntu:20.04
+dockerImage: ubuntu:mantic-20230926
 token: 'MEV_CI_DOCS'
 label: 'component-ci-nodes'
 name: John Doe
