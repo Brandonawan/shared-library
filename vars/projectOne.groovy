@@ -1,12 +1,11 @@
 // Define a function to check files and run the pipeline
 def call() {
-
     def jenkinBuildPath = 'scripts/jenkin-build'
     def pipelineConfigPath = 'scripts/pipeline-config.yml'
 
     pipeline {
         agent {
-            label 'component-ci-nodes'
+            label readYaml(file: pipelineConfigPath).label ?: 'component-ci-nodes'
         }
         options {
             ansiColor('xterm')
@@ -14,7 +13,7 @@ def call() {
         }
         triggers {
             GenericTrigger(
-                token: 'MEV_CI_DOCS',
+                token: readYaml(file: pipelineConfigPath).token ?: 'MEV_CI_DOCS',
                 printContributedVariables: true,
                 printPostContent: false,
             )
@@ -78,7 +77,6 @@ def call() {
                     }
                 }
             }
-
         }
     }
 }
