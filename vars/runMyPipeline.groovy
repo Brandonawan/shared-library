@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 // Define a default Docker image name
-def defaultDockerImage = 'debian:latest'
+def defaultDockerImage = 'ubuntu:latest'
 
 // Define a function to check files and run the pipeline
 def call() {
