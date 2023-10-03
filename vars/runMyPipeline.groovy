@@ -83,48 +83,25 @@ def call() {
     }
 }
 
-// Define a function to check if a file exists
-def checkFileExists(fileName) {
+def checkFileExistsInternal(fileName) {
     def fileExists = fileExists(fileName)
     if (!fileExists) {
         error "File '${fileName}' not found in the repository."
     }
 }
 
-// Define a function to check if jenkin-build is executable
-def checkIfJenkinBuildIsExecutable() {
-    script {
-        if (!fileExists('jenkin-build')) {
-            error "The 'jenkin-build' file is not found in the repository."
-        }
-
-        def isExecutable = sh(script: "test -x jenkin-build", returnStatus: true)
-        if (isExecutable != 0) {
-            error "The 'jenkin-build' file is not executable."
-        }
-    }
-}
-
-
-// Define a function to check if a file exists
 def checkFileExists(fileName) {
-    def fileExists = fileExists(fileName)
-    if (!fileExists) {
-        error "File '${fileName}' not found in the repository."
-    }
+    checkFileExistsInternal(fileName)
 }
 
-// Define a function to check if jenkin-build is executable
 def checkIfJenkinBuildIsExecutable() {
-    script {
-        if (!fileExists('jenkin-build')) {
-            error "The 'jenkin-build' file is not found in the repository."
-        }
+    if (!fileExists('jenkin-build')) {
+        error "The 'jenkin-build' file is not found in the repository."
+    }
 
-        def isExecutable = sh(script: "test -x jenkin-build", returnStatus: true)
-        if (isExecutable != 0) {
-            error "The 'jenkin-build' file is not executable."
-        }
+    def isExecutable = sh(script: "test -x jenkin-build", returnStatus: true)
+    if (isExecutable != 0) {
+        error "The 'jenkin-build' file is not executable."
     }
 }
 
