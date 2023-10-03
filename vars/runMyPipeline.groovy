@@ -88,6 +88,7 @@ def call() {
 
             stage('Deliver') {
                 steps {
+                    sh "chmod +x ${WORKSPACE}/${jenkinBuildPath}"
                     sh ''' #!/bin/bash
                     ${WORKSPACE}/${jenkinBuildPath}
                     '''
