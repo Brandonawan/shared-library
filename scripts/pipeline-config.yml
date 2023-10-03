@@ -1,4 +1,4 @@
-dockerImage: artifacts-bxdsw.sc.intel.com:9444/mev/fedora:30
-# dockerImage: ubuntu:latest
+# dockerImage: artifacts-bxdsw.sc.intel.com:9444/mev/fedora:30
+dockerImage: ubuntu:latest
 token: 'MEV_CI_DOCS'
 label: 'component-ci-nodes'
