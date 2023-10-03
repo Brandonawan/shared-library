@@ -36,7 +36,9 @@ def call() {
                         // Try to read the Docker image name from the pipeline-config.yml file
                         try {
                             def dockerConfig = readYaml file: 'pipeline-config.yml'
-                            dockerImage = dockerConfig.dockerImage
+                            if (dockerConfig && dockerConfig.dockerImage) {
+                                dockerImage = dockerConfig.dockerImage
+                            }
                         } catch (e) {
                             // If the file does not exist or cannot be read, use the default image name
                             logger.warning("Could not read Docker image name from pipeline-config.yml. Using default image name: ${dockerImage}")
@@ -104,6 +106,7 @@ def checkIfJenkinBuildIsExecutable() {
         error "The 'jenkin-build' file is not executable."
     }
 }
+
 
 // // Define a function to check files and run the pipeline
 // def call() {
