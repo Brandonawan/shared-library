@@ -31,7 +31,7 @@ def call() {
                 steps {
                     script {
                         // Set the default Docker image name
-                        def dockerImage = 'ubuntu:latest'
+                        def dockerImage = 'fedora:30'
 
                         // Try to read the Docker image name from the pipeline-config.yml file
                         try {
