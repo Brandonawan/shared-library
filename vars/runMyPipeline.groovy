@@ -1,5 +1,7 @@
 #!/usr/bin/env groovy
 
+def maxRetries = 3  // Define the maximum number of retry attempts
+
 // Define a function to check files and run the pipeline
 def call() {
     pipeline {
@@ -46,6 +48,30 @@ def call() {
 
                         // Set the Docker image name as an environment variable
                         env.DOCKER_IMAGE = dockerImage
+                    }
+                }
+            }
+
+            stage('Retry Docker Pull') {
+                steps {
+                    script {
+                        def retryCount = 0
+                        def retrySuccessful = false
+
+                        while (retryCount < maxRetries && !retrySuccessful) {
+                            def pullResult = sh(script: "docker pull ${env.DOCKER_IMAGE}", returnStatus: true)
+
+                            if (pullResult == 0) {
+                                retrySuccessful = true
+                            } else {
+                                retryCount++
+                                echo "Docker pull failed (attempt ${retryCount}). Retrying..."
+                            }
+                        }
+
+                        if (!retrySuccessful) {
+                            error "Failed to pull Docker image after ${maxRetries} attempts."
+                        }
                     }
                 }
             }
