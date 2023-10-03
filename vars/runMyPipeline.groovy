@@ -59,7 +59,7 @@ def call() {
                     docker {
                         image "${env.DOCKER_IMAGE}"
                         args '--user=root -v /mnt:/mnt'
-                        reuseNode(true) // Always pull the image if not available locally
+                        alwaysPull true // Always pull the image if not available locally
                     }
                 }
                 steps {
