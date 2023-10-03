@@ -58,7 +58,7 @@ def call() {
                 agent {
                     docker {
                         image "${env.DOCKER_IMAGE}"
-                        args '--user=root -v /mnt:/mnt'
+                        args '--user=root'
                         reuseNode(true) // Always pull the image if not available locally
                     }
                 }
