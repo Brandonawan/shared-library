@@ -18,11 +18,11 @@ def call() {
             stage('Check Files') {
                 steps {
                     script {
-                        checkFileExists('jenkin-build')
-                        checkFileExists('pipeline-config.yml')
+                        checkFileExists('scripts/jenkin-build')
+                        checkFileExists('scripts/pipeline-config.yml')
 
                         // Check if jenkin-build is executable
-                        checkIfJenkinBuildIsExecutable()
+                        checkIfJenkinBuildIsExecutable('scripts/jenkin-build')
                     }
                 }
             }
@@ -35,13 +35,13 @@ def call() {
 
                         // Try to read the Docker image name from the pipeline-config.yml file
                         try {
-                            def dockerConfig = readYaml file: 'pipeline-config.yml'
+                            def dockerConfig = readYaml file: 'scripts/pipeline-config.yml'
                             if (dockerConfig && dockerConfig.dockerImage) {
                                 dockerImage = dockerConfig.dockerImage
                             }
                         } catch (e) {
                             // If the file does not exist or cannot be read, use the default image name
-                            logger.warning("Could not read Docker image name from pipeline-config.yml. Using default image name: ${dockerImage}")
+                            logger.warning("Could not read Docker image name from scripts/pipeline-config.yml. Using default image name: ${dockerImage}")
                         }
 
                         // Set the Docker image name as an environment variable
@@ -77,7 +77,7 @@ def call() {
             stage('Deliver') {
                 steps {
                     sh ''' #!/bin/bash
-                    ./jenkin-build
+                    ./scripts/jenkin-build
                     '''
                 }
             }
@@ -96,16 +96,17 @@ def checkFileExists(fileName) {
     checkFileExistsInternal(fileName)
 }
 
-def checkIfJenkinBuildIsExecutable() {
-    if (!fileExists('jenkin-build')) {
-        error "The 'jenkin-build' file is not found in the repository."
+def checkIfJenkinBuildIsExecutable(fileName) {
+    if (!fileExists(fileName)) {
+        error "The '${fileName}' file is not found in the repository."
     }
 
-    def isExecutable = sh(script: "test -x jenkin-build", returnStatus: true)
+    def isExecutable = sh(script: "test -x ${fileName}", returnStatus: true)
     if (isExecutable != 0) {
-        error "The 'jenkin-build' file is not executable."
+        error "The '${fileName}' file is not executable."
     }
 }
+
 
 
 // // Define a function to check files and run the pipeline
