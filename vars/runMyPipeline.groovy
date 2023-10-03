@@ -54,7 +54,7 @@ def call() {
                 agent {
                     docker {
                         image "${env.DOCKER_IMAGE}"
-                        args '--user=root'
+                        args '--user=root -v /mnt:/mnt'
                     }
                 }
                 steps {
