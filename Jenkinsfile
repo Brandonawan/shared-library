@@ -1,13 +1,22 @@
 @Library('pipeline-library-demo')_
 runMyPipeline()
 
-// Define a function to check files and run the pipeline
+// // Define a function to check files and run the pipeline
 // def call() {
 //     pipeline {
-//         agent any
+//         agent {
+//             label 'component-ci-nodes'
+//         }
 //         options {
 //             ansiColor('xterm')
 //             timestamps()
+//         }
+//         triggers {
+//             GenericTrigger(
+//                 token: 'MEV_CI_DOCS',
+//                 printContributedVariables: true,
+//                 printPostContent: false,
+//             )
 //         }
 //         stages {
 //             stage('Checkout') {
@@ -15,15 +24,6 @@ runMyPipeline()
 //                     checkout scm
 //                 }
 //             }
-
-//             // stage('Create Non-Executable File') {
-//             //     steps {
-//             //         script {
-//             //             writeFile file: 'jenkin-build', text: 'This is a non-executable file content'
-//             //         }
-//             //     }
-//             // }
-
 //             stage('Check Files') {
 //                 steps {
 //                     script {
@@ -39,8 +39,19 @@ runMyPipeline()
 //             stage('Read Docker Image Name') {
 //                 steps {
 //                     script {
-//                         def dockerConfig = readYaml file: 'pipeline-config.yml'
-//                         def dockerImage = dockerConfig.dockerImage
+//                         // Set the default Docker image name
+//                         def dockerImage = 'ubuntu:latest'
+
+//                         // Try to read the Docker image name from the pipeline-config.yml file
+//                         try {
+//                             def dockerConfig = readYaml file: 'pipeline-config.yml'
+//                             if (dockerConfig && dockerConfig.dockerImage) {
+//                                 dockerImage = dockerConfig.dockerImage
+//                             }
+//                         } catch (e) {
+//                             // If the file does not exist or cannot be read, use the default image name
+//                             logger.warning("Could not read Docker image name from pipeline-config.yml. Using default image name: ${dockerImage}")
+//                         }
 
 //                         // Set the Docker image name as an environment variable
 //                         env.DOCKER_IMAGE = dockerImage
@@ -48,7 +59,7 @@ runMyPipeline()
 //                 }
 //             }
 
-//             stage('Run Inside Docker Image') {
+//             stage('Build') {
 //                 agent {
 //                     docker {
 //                         image "${env.DOCKER_IMAGE}"
@@ -60,39 +71,37 @@ runMyPipeline()
 //                 }
 //                 steps {
 //                     withCredentials([usernamePassword(credentialsId: 'nexus-docker-creds', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-//                         sh 'docker login -u ${USERNAME} -p ${PASSWORD} https://artifact-bxdsw.sc.intel.com:9444'
+//                         sh ''' #!/bin/bash
+//                         ./jenkin-build
+//                         '''
 //                     }
 //                 }
 //             }
 
-//             stage('Deliver') {
-//                 steps {
-//                     sh './jenkin-build'
-//                 }
-//             }
 //         }
 //     }
 // }
 
-// // Define a function to check if a file exists
-// def checkFileExists(fileName) {
+
+// def checkFileExistsInternal(fileName) {
 //     def fileExists = fileExists(fileName)
 //     if (!fileExists) {
 //         error "File '${fileName}' not found in the repository."
 //     }
 // }
 
-// // Define a function to check if jenkin-build is executable
-// def checkIfJenkinBuildIsExecutable() {
-//     script {
-//         if (!fileExists('jenkin-build')) {
-//             error "The 'jenkin-build' file is not found in the repository."
-//         }
+// def checkFileExists(fileName) {
+//     checkFileExistsInternal(fileName)
+// }
 
-//         def isExecutable = sh(script: "test -x jenkin-build", returnStatus: true)
-//         if (isExecutable != 0) {
-//             error "The 'jenkin-build' file is not executable."
-//         }
+// def checkIfJenkinBuildIsExecutable() {
+//     if (!fileExists('jenkin-build')) {
+//         error "The 'jenkin-build' file is not found in the repository."
+//     }
+
+//     def isExecutable = sh(script: "test -x jenkin-build", returnStatus: true)
+//     if (isExecutable != 0) {
+//         error "The 'jenkin-build' file is not executable."
 //     }
 // }
 
