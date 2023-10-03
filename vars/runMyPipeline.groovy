@@ -73,7 +73,9 @@ def call() {
 
             stage('Deliver') {
                 steps {
-                    sh './jenkin-build'
+                    sh ''' #!/bin/bash
+                    ./jenkin-build
+                    '''
                 }
             }
         }
