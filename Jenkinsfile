@@ -1,86 +1,101 @@
 @Library('pipeline-library-demo')_
 runMyPipeline()
 
-// // Define a function to check files and run the pipeline
-// def call() {
-//     pipeline {
-//         agent {
-//             label 'component-ci-nodes'
-//         }
-//         options {
-//             ansiColor('xterm')
-//             timestamps()
-//         }
-//         triggers {
-//             GenericTrigger(
-//                 token: 'MEV_CI_DOCS',
-//                 printContributedVariables: true,
-//                 printPostContent: false,
-//             )
-//         }
-//         stages {
-//             stage('Checkout') {
-//                 steps {
-//                     checkout scm
-//                 }
-//             }
-//             stage('Check Files') {
-//                 steps {
-//                     script {
-//                         checkFileExists('jenkin-build')
-//                         checkFileExists('pipeline-config.yml')
 
-//                         // Check if jenkin-build is executable
-//                         checkIfJenkinBuildIsExecutable()
-//                     }
-//                 }
-//             }
+// Define a function to check files and run the pipeline
+def call() {
+    pipeline {
+        agent {
+            label 'component-ci-nodes'
+        }
+        options {
+            ansiColor('xterm')
+            timestamps()
+        }
+        triggers {
+            GenericTrigger(
+                token: 'MEV_CI_DOCS',
+                printContributedVariables: true,
+                printPostContent: false,
+            )
+        }
+        stages {
+            stage('Checkout') {
+                steps {
+                    checkout scm
+                }
+            }
+            stage('Check Files') {
+                steps {
+                    script {
+                        checkFileExists('scripts/jenkin-build')
+                        checkFileExists('scripts/pipeline-config.yml')
 
-//             stage('Read Docker Image Name') {
-//                 steps {
-//                     script {
-//                         // Set the default Docker image name
-//                         def dockerImage = 'ubuntu:latest'
+                        // Check if jenkin-build is executable
+                        checkIfJenkinBuildIsExecutable('scripts/jenkin-build')
+                    }
+                }
+            }
 
-//                         // Try to read the Docker image name from the pipeline-config.yml file
-//                         try {
-//                             def dockerConfig = readYaml file: 'pipeline-config.yml'
-//                             if (dockerConfig && dockerConfig.dockerImage) {
-//                                 dockerImage = dockerConfig.dockerImage
-//                             }
-//                         } catch (e) {
-//                             // If the file does not exist or cannot be read, use the default image name
-//                             logger.warning("Could not read Docker image name from pipeline-config.yml. Using default image name: ${dockerImage}")
-//                         }
+            stage('Read Docker Image Name') {
+                steps {
+                    script {
+                        // Set the default Docker image name
+                        def dockerImage = 'ubuntu:latest'
 
-//                         // Set the Docker image name as an environment variable
-//                         env.DOCKER_IMAGE = dockerImage
-//                     }
-//                 }
-//             }
+                        // Try to read the Docker image name from the pipeline-config.yml file
+                        try {
+                            def dockerConfig = readYaml file: 'pipeline-config.yml'
+                            if (dockerConfig && dockerConfig.dockerImage) {
+                                dockerImage = dockerConfig.dockerImage
+                            }
+                        } catch (e) {
+                            // If the file does not exist or cannot be read, use the default image name
+                            logger.warning("Could not read Docker image name from pipeline-config.yml. Using default image name: ${dockerImage}")
+                        }
 
-//             stage('Build') {
-//                 agent {
-//                     docker {
-//                         image "${env.DOCKER_IMAGE}"
-//                         registryUrl 'https://artifact-bxdsw.sc.intel.com:9444'
-//                         registryCredentialsId 'nexus-docker-creds'
-//                         args '--user=root -v /mnt:/mnt'
-//                         alwaysPull true
-//                     }
-//                 }
-//                 steps {
-//                     withCredentials([usernamePassword(credentialsId: 'nexus-docker-creds', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-//                         sh ''' #!/bin/bash
-//                         ./jenkin-build
-//                         '''
-//                     }
-//                 }
-//             }
+                        // Set the Docker image name as an environment variable
+                        env.DOCKER_IMAGE = dockerImage
+                    }
+                }
+            }
 
-//         }
-//     }
-// }
+            stage('Build') {
+                agent {
+                    docker {
+                        image "${env.DOCKER_IMAGE}"
+                        registryUrl 'https://artifact-bxdsw.sc.intel.com:9444'
+                        registryCredentialsId 'nexus-docker-creds'
+                        args '--user=root -v /mnt:/mnt'
+                        alwaysPull true
+                    }
+                }
+                steps {
+                    withCredentials([usernamePassword(credentialsId: 'nexus-docker-creds', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                        sh ''' #!/bin/bash
+                        ./jenkin-build
+                        '''
+                    }
+                }
+            }
+
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // def checkFileExistsInternal(fileName) {
@@ -105,48 +120,6 @@ runMyPipeline()
 //     }
 // }
 
-
-// pipeline {
-//     agent any
-
-//     environment {
-//         // Define the repository URL and the branch you want to check
-//         REPO_URL = 'https://github.com/Brandonawan/shared-library.git'
-//         BRANCH_NAME = 'main'
-//         FILE_TO_CHECK = 'jenkin-buildss' // Specify the path to the file you want to check
-//     }
-
-//     stages {
-//         stage('Checkout') {
-//             steps {
-//                 script {
-//                     // Checkout the repository
-//                     checkout([$class: 'GitSCM', branches: [[name: BRANCH_NAME]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'your-git-credentials-id', url: REPO_URL]]])
-//                 }
-//             }
-//         }
-//         stage('Check Workspace Contents') {
-//             steps {
-//                 sh 'ls -l' // List the contents of the workspace
-//             }
-//         }
-
-//         stage('Check File') {
-//             steps {
-//                 script {
-//                     // Check if the specified file exists
-//                     def fileExists = fileExists(FILE_TO_CHECK)
-
-//                     if (fileExists) {
-//                         echo "File '$FILE_TO_CHECK' exists in the repository."
-//                     } else {
-//                         error "File '$FILE_TO_CHECK' does not exist in the repository."
-//                     }
-//                 }
-//             }
-//         }
-//     }
-// }
 
 // pipeline {
 //     agent {
