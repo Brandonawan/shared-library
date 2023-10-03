@@ -1,5 +1,4 @@
 #!/usr/bin/env groovy
-#!/usr/bin/env groovy
 
 // Define a default Docker image name
 def defaultDockerImage = 'debian:latest'
