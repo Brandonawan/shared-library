@@ -89,7 +89,7 @@ def call() {
             stage('Deliver') {
                 steps {
                     sh ''' #!/bin/bash
-                    ./${jenkinBuildPath}
+                    ${WORKSPACE}/${jenkinBuildPath}
                     '''
                 }
             }
