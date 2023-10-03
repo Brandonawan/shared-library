@@ -1,7 +1,6 @@
 @Library('pipeline-library-demo')_
-// runMyPipeline()
 projectOne()
-
+// test()
 
 
 

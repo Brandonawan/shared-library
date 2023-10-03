@@ -5,15 +5,15 @@ yamlFile="scripts/pipeline-config.yml"
 eval $(cat "$yamlFile" | sed 's/:[^:\/\/]/="/;s/$/"/')
 
 # Access the variables
-name="$name"
-age="$age"
-email="$email"
+dockerImage="$dockerImage"
+token="$token"
+label="$label"
 
 # Use the values in your script
 echo "Running jenkin-build script..."
-echo "Name: $name"
-echo "Age: $age"
-echo "Email: $email"
+echo "Docker Image: $dockerImage"
+echo "Token: $token"
+echo "label: $label"
 
 # Add your build logic here
 # Customize the build process using these values
