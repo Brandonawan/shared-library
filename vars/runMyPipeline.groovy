@@ -1,8 +1,5 @@
 #!/usr/bin/env groovy
 
-// Define a default Docker image name
-def defaultDockerImage = 'ubuntu:latest'
-
 // Define a function to check files and run the pipeline
 def call() {
     pipeline {
@@ -33,9 +30,17 @@ def call() {
             stage('Read Docker Image Name') {
                 steps {
                     script {
-                        // Read the Docker image name from pipeline-config.yml or use the default
-                        def dockerConfig = readYaml file: 'pipeline-config.yml'
-                        def dockerImage = dockerConfig?.dockerImage ?: defaultDockerImage
+                        // Set the default Docker image name
+                        def dockerImage = 'debian'
+
+                        // Try to read the Docker image name from the pipeline-config.yml file
+                        try {
+                            def dockerConfig = readYaml file: 'pipeline-config.yml'
+                            dockerImage = dockerConfig.dockerImage
+                        } catch (e) {
+                            // If the file does not exist or cannot be read, use the default image name
+                            logger.warning("Could not read Docker image name from pipeline-config.yml. Using default image name: ${dockerImage}")
+                        }
 
                         // Set the Docker image name as an environment variable
                         env.DOCKER_IMAGE = dockerImage
@@ -77,6 +82,29 @@ def call() {
         }
     }
 }
+
+// Define a function to check if a file exists
+def checkFileExists(fileName) {
+    def fileExists = fileExists(fileName)
+    if (!fileExists) {
+        error "File '${fileName}' not found in the repository."
+    }
+}
+
+// Define a function to check if jenkin-build is executable
+def checkIfJenkinBuildIsExecutable() {
+    script {
+        if (!fileExists('jenkin-build')) {
+            error "The 'jenkin-build' file is not found in the repository."
+        }
+
+        def isExecutable = sh(script: "test -x jenkin-build", returnStatus: true)
+        if (isExecutable != 0) {
+            error "The 'jenkin-build' file is not executable."
+        }
+    }
+}
+
 
 // Define a function to check if a file exists
 def checkFileExists(fileName) {
