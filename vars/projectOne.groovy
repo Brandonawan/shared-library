@@ -3,7 +3,7 @@
 // Define a function to check files and run the pipeline
 def call() {
 
-    def jenkinBuildPath = 'hello.py'
+    def jenkinBuildPath = ''
     def pipelineConfigPath = 'config/pipeline-config.yml'
 
     pipeline {

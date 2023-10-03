@@ -10,5 +10,6 @@
 def greet(name):
     message = f"Hello, {name}!"
     print(message)  # Print the greeting message
+    return message  # Return the greeting message for testing
 
 greet("World")
