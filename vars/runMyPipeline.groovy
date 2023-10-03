@@ -59,7 +59,7 @@ def call() {
                     docker {
                         image "${env.DOCKER_IMAGE}"
                         args '--user=root -v /mnt:/mnt'
-                        alwaysPull true // Always pull the image if not available locally
+                        reuseNode(true) // Always pull the image if not available locally
                     }
                 }
                 steps {
@@ -81,17 +81,9 @@ def call() {
 
             stage('Deliver') {
                 steps {
-                    script {
-                        def jenkinBuildScript = "${WORKSPACE}/${jenkinBuildPath}"
-                        echo "Attempting to execute script: ${jenkinBuildScript}"
-                        
-                        sh "ls -l ${jenkinBuildScript}" // List file permissions
-                        sh "file ${jenkinBuildScript}"    // Identify file type
-                        sh "cat ${jenkinBuildScript}"     // Print the content of the script
-                        
-                        sh "chmod +x ${jenkinBuildScript}" // Ensure the script is executable
-                        sh "${jenkinBuildScript}"          // Execute the script
-                    }
+                    sh ''' #!/bin/bash
+                    ./${jenkinBuildPath}
+                    '''
                 }
             }
         }
@@ -119,7 +111,6 @@ def checkIfJenkinBuildIsExecutable(fileName) {
         error "The '${fileName}' file is not executable."
     }
 }
-
 
 
 // // Define a function to check files and run the pipeline
