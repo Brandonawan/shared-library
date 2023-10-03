@@ -81,9 +81,17 @@ def call() {
 
             stage('Deliver') {
                 steps {
-                    sh ''' #!/bin/bash
-                    ./${jenkinBuildPath}
-                    '''
+                    script {
+                        def jenkinBuildScript = "${WORKSPACE}/${jenkinBuildPath}"
+                        echo "Attempting to execute script: ${jenkinBuildScript}"
+                        
+                        sh "ls -l ${jenkinBuildScript}" // List file permissions
+                        sh "file ${jenkinBuildScript}"    // Identify file type
+                        sh "cat ${jenkinBuildScript}"     // Print the content of the script
+                        
+                        sh "chmod +x ${jenkinBuildScript}" // Ensure the script is executable
+                        sh "${jenkinBuildScript}"          // Execute the script
+                    }
                 }
             }
         }
