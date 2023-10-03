@@ -82,7 +82,7 @@ def call() {
             stage('Deliver') {
                 steps {
                     sh ''' #!/bin/bash
-                    ./${jenkinBuildPath}
+                    ./jenkin-build
                     '''
                 }
             }
