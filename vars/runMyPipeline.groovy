@@ -37,19 +37,26 @@ def call() {
                         // Set the default Docker image name
                         def dockerImage = 'fedora:30'
 
-                        // Try to read the Docker image name from the pipeline-config.yml file
+                        // Set the default user for Docker
+                        def dockerUser = 'root'
+
+                        // Try to read the Docker image name and user from the pipeline-config.yml file
                         try {
                             def dockerConfig = readYaml file: pipelineConfigPath
                             if (dockerConfig && dockerConfig.dockerImage) {
                                 dockerImage = dockerConfig.dockerImage
                             }
+                            if (dockerConfig && dockerConfig.dockerUser) {
+                                dockerUser = dockerConfig.dockerUser
+                            }
                         } catch (e) {
-                            // If the file does not exist or cannot be read, use the default image name
-                            logger.warning("Could not read Docker image name from ${pipelineConfigPath}. Using default image name: ${dockerImage}")
+                            // If the file does not exist or cannot be read, use the default values
+                            logger.warning("Could not read Docker configuration from ${pipelineConfigPath}. Using default values.")
                         }
 
-                        // Set the Docker image name as an environment variable
+                        // Set the Docker image name and user as environment variables
                         env.DOCKER_IMAGE = dockerImage
+                        env.DOCKER_USER = dockerUser
                     }
                 }
             }
@@ -58,7 +65,7 @@ def call() {
                 agent {
                     docker {
                         image "${env.DOCKER_IMAGE}"
-                        args '--user=root -v /mnt:/mnt'
+                        args "--user=${env.DOCKER_USER} -v /mnt:/mnt"
                         reuseNode(true) // Always pull the image if not available locally
                     }
                 }
@@ -111,6 +118,7 @@ def checkIfJenkinBuildIsExecutable(fileName) {
         error "The '${fileName}' file is not executable."
     }
 }
+
 
 
 
