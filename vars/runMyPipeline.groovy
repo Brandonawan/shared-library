@@ -38,8 +38,15 @@ def call() {
             stage('Read Docker Image Name') {
                 steps {
                     script {
+                        // def dockerConfig = readYaml file: 'pipeline-config.yml'
+                        // def dockerImage = dockerConfig.dockerImage
+
+                        // Set the Docker image name as an environment variable
+                        // env.DOCKER_IMAGE = dockerImage
+
+                        // Read the Docker image name from pipeline-config.yml or use the default
                         def dockerConfig = readYaml file: 'pipeline-config.yml'
-                        def dockerImage = dockerConfig.dockerImage
+                        def dockerImage = dockerConfig?.dockerImage ?: defaultDockerImage
 
                         // Set the Docker image name as an environment variable
                         env.DOCKER_IMAGE = dockerImage
