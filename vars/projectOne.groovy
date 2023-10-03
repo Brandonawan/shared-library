@@ -104,20 +104,11 @@ def checkFileExists(fileName) {
 def checkIfJenkinBuildIsExecutable(fileName) {
     if (!fileExists(fileName)) {
         error "The '${fileName}' file is not found in the repository."
-    } else {
-        def isExecutable = sh(script: "test -x ${fileName}", returnStatus: true)
-        if (isExecutable != 0) {
-            // Attempt to make the file executable
-            sh "chmod +x ${fileName}"
-            
-            // Check again if it's executable now
-            isExecutable = sh(script: "test -x ${fileName}", returnStatus: true)
-            if (isExecutable == 0) {
-                echo "Made '${fileName}' executable."
-            } else {
-                error "Failed to make '${fileName}' executable."
-            }
-        }
+    }
+
+    def isExecutable = sh(script: "test -x ${fileName}", returnStatus: true)
+    if (isExecutable != 0) {
+        error "The '${fileName}' file is not executable."
     }
 }
 
