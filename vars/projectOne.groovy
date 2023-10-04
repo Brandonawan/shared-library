@@ -39,7 +39,7 @@ def call() {
                 steps {
                     script {
                         // Set the default Docker image name
-                        def dockerImage = 'ubuntu:22.04'
+                        def dockerImage = 'ubuntu:latest'
 
                         // Try to read the Docker image name from the pipeline-config.yml file
                         try {
