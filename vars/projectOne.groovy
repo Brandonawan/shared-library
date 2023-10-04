@@ -125,7 +125,6 @@ def checkIfJenkinBuildIsExecutable(fileName) {
     }
 }
 
-// #!/usr/bin/env groovy
 
 // // Define a function to check files and run the pipeline
 // def call() {
