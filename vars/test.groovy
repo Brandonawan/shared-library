@@ -4,6 +4,7 @@
 def call() {
 
     def jenkinBuildPath = 'scripts/jenkin-build'
+    // def jenkinBuildPath = 'scripts/index.py'
     def pipelineConfigPath = 'scripts/pipeline-config.yml'
 
     pipeline {
@@ -107,4 +108,3 @@ def checkIfJenkinBuildIsExecutable(fileName) {
         error "The '${fileName}' file is not executable."
     }
 }
-
