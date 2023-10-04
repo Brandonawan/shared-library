@@ -4,7 +4,7 @@
 def call() {
 
     // def jenkinBuildPath = 'scripts/jenkin-build'
-    def jenkinBuildPath = 'scripts/hello.py'
+    def jenkinBuildPath = 'scripts/index.py'
     def pipelineConfigPath = 'scripts/pipeline-config.yml'
 
     pipeline {
