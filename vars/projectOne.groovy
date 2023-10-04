@@ -138,7 +138,11 @@ def checkIfJenkinBuildIsExecutable(fileName) {
 //             stage('Check Files') {
 //                 steps {
 //                     script {
-//                         checkFileExists(jenkinBuildPath)
+//                         if (jenkinBuildPath.isEmpty()) {
+//                             error "No build script is found. Please specify a valid file path."
+//                         }
+
+//                         checkFileExistsInternal(jenkinBuildPath)
 //                         checkFileExists(pipelineConfigPath)
 
 //                         // Check if jenkin-build is executable
@@ -146,7 +150,6 @@ def checkIfJenkinBuildIsExecutable(fileName) {
 //                     }
 //                 }
 //             }
-
 //             stage('Read Docker Image Name') {
 //                 steps {
 //                     script {
@@ -189,5 +192,27 @@ def checkIfJenkinBuildIsExecutable(fileName) {
 //                 }
 //             }
 //         }
+//     }
+// }
+
+// def checkFileExistsInternal(fileName) {
+//     def fileExists = fileExists(fileName)
+//     if (!fileExists) {
+//         error "File '${fileName}' not found in the repository."
+//     }
+// }
+
+// def checkFileExists(fileName) {
+//     checkFileExistsInternal(fileName)
+// }
+
+// def checkIfJenkinBuildIsExecutable(fileName) {
+//     if (!fileExists(fileName)) {
+//         error "The '${fileName}' file is not found in the repository."
+//     }
+
+//     def isExecutable = sh(script: "test -x ${fileName}", returnStatus: true)
+//     if (isExecutable != 0) {
+//         error "The '${fileName}' file is not executable."
 //     }
 // }
