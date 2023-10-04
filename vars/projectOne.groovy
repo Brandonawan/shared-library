@@ -22,7 +22,11 @@ def call() {
             stage('Check Files') {
                 steps {
                     script {
-                        checkFileExists(jenkinBuildPath)
+                        if (jenkinBuildPath.isEmpty()) {
+                            error "No build script is found. Please specify a valid file path."
+                        }
+
+                        checkFileExistsInternal(jenkinBuildPath)
                         checkFileExists(pipelineConfigPath)
 
                         // Check if jenkin-build is executable

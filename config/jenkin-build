@@ -15,5 +15,3 @@ echo "Docker Image: $dockerImage"
 echo "Token: $token"
 echo "label: $label"
 
-# Add your build logic here
-# Customize the build process using these values
