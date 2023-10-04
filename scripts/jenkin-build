@@ -1,17 +1,21 @@
 #!/bin/bash
 
-# Load the YAML file
-yamlFile="pipeline-config.yml"
-eval $(cat "$yamlFile" | sed 's/:[^:\/\/]/="/;s/$/"/')
+# Get the absolute path to the directory containing this script
+scriptDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Access the variables
-dockerImage="$dockerImage"
-token="$token"
-label="$label"
+# Specify the relative path to the YAML file
+yamlFile="${scriptDir}/pipeline-config.yml"
+
+# Load the YAML file and assign variables
+if [ -f "$yamlFile" ]; then
+    eval $(cat "$yamlFile" | sed 's/:[^:\/\/]/="/;s/$/"/')
+else
+    echo "Error: $yamlFile not found."
+    exit 1
+fi
 
 # Use the values in your script
 echo "Running jenkin-build script..."
 echo "Docker Image: $dockerImage"
 echo "Token: $token"
-echo "label: $label"
-
+echo "Label: $label"

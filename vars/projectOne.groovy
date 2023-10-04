@@ -1,6 +1,6 @@
+
 #!/usr/bin/env groovy
 
-// Define a function to check files and run the pipeline
 def call() {
 
     def jenkinBuildPath = 'scripts/jenkin-build'
@@ -48,7 +48,6 @@ def call() {
                                 dockerImage = dockerConfig.dockerImage
                             }
                         } catch (e) {
-                            // If the file does not exist or cannot be read, use the default image name
                             logger.warning("Could not read Docker image name from ${pipelineConfigPath}. Using default image name: ${dockerImage}")
                         }
 
@@ -62,24 +61,42 @@ def call() {
                 agent {
                     docker {
                         image "${env.DOCKER_IMAGE}"
-                        args '--user=root'
-                        reuseNode(true) // Always pull the image if not available locally
+                        args '--user=root -v /mnt:/mnt'
+                        reuseNode(true)
                     }
                 }
                 steps {
                     sh 'apt-get update'
-                    sh 'apt-get install -y python3-venv python3-pip' // Install Python virtualenv and pip
-                    sh 'python3 -m venv venv' // Create a virtual environment
-                    sh '. venv/bin/activate' // Activate the virtual environment using the dot command
+                    sh 'apt-get install -y python3-venv python3-pip'
+                    sh 'python3 -m venv venv'
+                    sh '. venv/bin/activate'
 
                     // Install dependencies (if you have a requirements.txt file)
                     sh 'pip install -r requirements.txt'
 
-                    // Run the script (adjust the command accordingly)
-                    sh "./${jenkinBuildPath}"
+                    // Retry mechanism for running the script with a maximum of 3 retries
+                    script {
+                        def maxRetries = 3
+                        def retryCount = 0
+                        def success = false
 
-                    // Deactivate the virtual environment using the deactivate function
-                    sh 'deactivate || true' // Use '|| true' to ignore errors if deactivate fails
+                        while (!success && retryCount < maxRetries) {
+                            try {
+                                sh "./${jenkinBuildPath}"
+                                success = true
+                            } catch (Exception e) {
+                                retryCount++
+                                if (retryCount < maxRetries) {
+                                    echo "Failed to run ${jenkinBuildPath}. Retrying (${retryCount}/${maxRetries})..."
+                                    sleep 10  // Add a delay before retrying
+                                } else {
+                                    error "Failed to run ${jenkinBuildPath} after ${maxRetries} retries."
+                                }
+                            }
+                        }
+                    }
+
+                    sh 'deactivate || true'
                 }
             }
         }
@@ -108,18 +125,13 @@ def checkIfJenkinBuildIsExecutable(fileName) {
     }
 }
 
-
-
-
-
 // #!/usr/bin/env groovy
 
 // // Define a function to check files and run the pipeline
 // def call() {
 
-//     // def jenkinBuildPath = 'jenkin-build'
-//     def jenkinBuildPath = 'hello.py'
-//     def pipelineConfigPath = 'config/pipeline-config.yml'
+//     def jenkinBuildPath = 'scripts/jenkin-build'
+//     def pipelineConfigPath = 'scripts/pipeline-config.yml'
 
 //     pipeline {
 //         agent any
@@ -137,7 +149,11 @@ def checkIfJenkinBuildIsExecutable(fileName) {
 //             stage('Check Files') {
 //                 steps {
 //                     script {
-//                         checkFileExists(jenkinBuildPath)
+//                         if (jenkinBuildPath.isEmpty()) {
+//                             error "No build script is found. Please specify a valid file path."
+//                         }
+
+//                         checkFileExistsInternal(jenkinBuildPath)
 //                         checkFileExists(pipelineConfigPath)
 
 //                         // Check if jenkin-build is executable
@@ -173,7 +189,7 @@ def checkIfJenkinBuildIsExecutable(fileName) {
 //                 agent {
 //                     docker {
 //                         image "${env.DOCKER_IMAGE}"
-//                         args '--user=root'
+//                         args '--user=root -v /mnt:/mnt'
 //                         reuseNode(true) // Always pull the image if not available locally
 //                     }
 //                 }
@@ -186,15 +202,12 @@ def checkIfJenkinBuildIsExecutable(fileName) {
 //                     // Install dependencies (if you have a requirements.txt file)
 //                     sh 'pip install -r requirements.txt'
 
-//                     // Run tests (adjust the command accordingly)
-//                     sh 'pytest --junitxml=pytest-results.xml'
+//                     // Run the script (adjust the command accordingly)
+//                     sh "./${jenkinBuildPath}"
 
 //                     // Deactivate the virtual environment using the deactivate function
 //                     sh 'deactivate || true' // Use '|| true' to ignore errors if deactivate fails
-
-//                     sh ' ./${jenkinBuildPath}'
 //                 }
-
 //             }
 //         }
 //     }
