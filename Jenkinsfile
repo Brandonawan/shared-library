@@ -1,6 +1,6 @@
 @Library('projectOne-pipeline-library')_
-// projectOne()
-test()
+projectOne()
+// test()
 
 
 
