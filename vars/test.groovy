@@ -83,6 +83,18 @@ def call() {
                     sh 'deactivate || true' // Use '|| true' to ignore errors if deactivate fails
                 }
             }
+
+            stage('Post-Build Cleanup') {
+                steps {
+                    script {
+                        // Define the workspace directory
+                        def workspaceDir = pwd()
+                        
+                        // Remove the workspace directory
+                        sh "rm -rf $workspaceDir/*"
+                    }
+                }
+            }
         }
     }
 }
