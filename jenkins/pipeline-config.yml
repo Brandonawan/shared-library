@@ -1,8 +1,7 @@
-# dockerImage: artifacts-bxdsw.sc.intel.com:9444/mev/fedora:30
 token: MEV_CI_DOCS
 label: component-ci-nodes
-# dockerImage: ubuntu:latest
-
+dockerImage: ubuntu:latest
+# dockerImage: artifacts-bxdsw.sc.intel.com:9444/mev/fedora:30
 
 
 # jenkinsFileEath: ienkinsilenkinsfile-post-merge
@@ -16,7 +15,6 @@ label: component-ci-nodes
 
 # supported values [scm-checkout:strategy(defautt), repo-tool-with-gh-token-strategy, custom:scm:checkout:strateay]
 scmCheckoutStrateay:
-
 - strategy-name: repo-tool-with-gh-token:sirategy.
 - github-token-ienkins-credential-id: afadfadfadfdaf
 - repo-manifest-url: github.comy/intel-innersource/networking.ipu. mountevans.manifests

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# This script is part of the Jenkins shared library.
+# It reads configuration from pipeline-config.yml and performs some actions.
+
 # Get the absolute path to the directory containing this script
 scriptDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 

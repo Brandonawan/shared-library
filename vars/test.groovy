@@ -3,9 +3,9 @@
 // Define a function to check files and run the pipeline
 def call() {
 
-    def jenkinBuildPath = 'jenkins/jenkin-build'
-    // def jenkinBuildPath = 'jenkins/index.py'
+    def jenkinsBuildPath = 'jenkins/jenkin-build'
     def pipelineConfigPath = 'jenkins/pipeline-config.yml'
+    def confluenceDocLink = 'https://your-confluence-link.com/documentation'
 
     pipeline {
         agent any
@@ -23,15 +23,15 @@ def call() {
             stage('Check Files') {
                 steps {
                     script {
-                        if (jenkinBuildPath.isEmpty()) {
-                            error "No build script is found. Please specify a valid file path."
+                        if (jenkinsBuildPath.isEmpty()) {
+                            error("Error: No build script is found. Please specify a valid file path. Refer to the documentation for guidance: [${confluenceDocLink}]")
                         }
 
-                        checkFileExistsInternal(jenkinBuildPath)
+                        checkFileExistsInternal(jenkinsBuildPath)
                         checkFileExists(pipelineConfigPath)
 
-                        // Check if jenkin-build is executable
-                        checkIfJenkinBuildIsExecutable(jenkinBuildPath)
+                        // Check if jenkins-build is executable
+                        checkIfJenkinsBuildIsExecutable(jenkinsBuildPath)
                     }
                 }
             }
@@ -39,22 +39,18 @@ def call() {
             stage('Read Docker Image Name') {
                 steps {
                     script {
-                        // Set the default Docker image name
-                        def dockerImage = 'ubuntu:latest'
-
                         // Try to read the Docker image name from the pipeline-config.yml file
                         try {
                             def dockerConfig = readYaml file: pipelineConfigPath
                             if (dockerConfig && dockerConfig.dockerImage) {
-                                dockerImage = dockerConfig.dockerImage
+                                // Set the Docker image name as an environment variable
+                                env.DOCKER_IMAGE = dockerConfig.dockerImage
+                            } else {
+                                error("Error: Docker image name not found in ${pipelineConfigPath}. Please specify a Docker image name in the configuration. Refer to the documentation for guidance: [${confluenceDocLink}]")
                             }
                         } catch (e) {
-                            // If the file does not exist or cannot be read, use the default image name
-                            logger.warning("Could not read Docker image name from ${pipelineConfigPath}. Using default image name: ${dockerImage}")
+                            error("Error: Could not read Docker image name from ${pipelineConfigPath}. Please check the configuration. Refer to the documentation for guidance: [${confluenceDocLink}]")
                         }
-
-                        // Set the Docker image name as an environment variable
-                        env.DOCKER_IMAGE = dockerImage
                     }
                 }
             }
@@ -77,16 +73,19 @@ def call() {
                     sh 'pip install -r requirements.txt'
 
                     // Run the script (adjust the command accordingly)
-                    sh "./${jenkinBuildPath}"
+                    sh "./${jenkinsBuildPath}"
 
                     // Deactivate the virtual environment using the deactivate function
                     sh 'deactivate || true' // Use '|| true' to ignore errors if deactivate fails
                 }
             }
 
-            stage('CleanWorkspace') {
+            stage('Clean Workspace') {
                 steps {
                     cleanWs()
+                    echo 'Workspace cleaned successfully'
+                    echo '${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully}'
+                    echo 'View Documentation: ${confluenceDocLink}'
                 }
             }
         }
@@ -96,7 +95,7 @@ def call() {
 def checkFileExistsInternal(fileName) {
     def fileExists = fileExists(fileName)
     if (!fileExists) {
-        error "File '${fileName}' not found in the repository."
+        error("Error: File '${fileName}' not found in the repository. Refer to the documentation for guidance: [${confluenceDocLink}]")
     }
 }
 
@@ -104,13 +103,13 @@ def checkFileExists(fileName) {
     checkFileExistsInternal(fileName)
 }
 
-def checkIfJenkinBuildIsExecutable(fileName) {
+def checkIfJenkinsBuildIsExecutable(fileName) {
     if (!fileExists(fileName)) {
-        error "The '${fileName}' file is not found in the repository."
+        error("Error: The '${fileName}' file is not found in the repository. Refer to the documentation for guidance: [${confluenceDocLink}]")
     }
 
     def isExecutable = sh(script: "test -x ${fileName}", returnStatus: true)
     if (isExecutable != 0) {
-        error "The '${fileName}' file is not executable."
+        error("Error: The '${fileName}' file is not executable. Refer to the documentation for guidance: [${confluenceDocLink}]")
     }
 }
