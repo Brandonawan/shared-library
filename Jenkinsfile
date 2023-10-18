@@ -1,5 +1,5 @@
 @Library('projectOne-pipeline-library')_
-projectOne()
+test()
 
 
 
