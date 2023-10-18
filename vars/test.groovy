@@ -70,13 +70,19 @@ def call() {
                     sh '. venv/bin/activate' // Activate the virtual environment using the dot command
 
                     // Install dependencies (if you have a requirements.txt file)
-                    sh 'pip install -r requirements.txt'
+                    sh 'pip install -r requirements.txt' || error("Error: Failed to install Python dependencies. Refer to the documentation for guidance: [${confluenceDocLink}]")
 
                     // Run the script (adjust the command accordingly)
-                    sh "./${jenkinsBuildPath}" || error("Error: Failed to execute '${jenkinsBuildPath}'. Refer to the documentation for guidance: [${confluenceDocLink}]")
+                    script {
+                        def runScript = "./${jenkinsBuildPath}"
+                        def scriptStatus = sh(script: runScript, returnStatus: true)
+                        if (scriptStatus != 0) {
+                            error("Error: Failed to execute '${jenkinsBuildPath}'. Refer to the documentation for guidance: [${confluenceDocLink}]")
+                        }
+                    }
 
-                    // Deactivate the virtual environment using the deactivate function
-                    sh 'deactivate || true' || error("Error: Failed to deactivate virtual environment. Refer to the documentation for guidance: [${confluenceDocLink}]")
+                    // Deactivate the virtual environment
+                    sh 'deactivate'
                 }
             }
 
