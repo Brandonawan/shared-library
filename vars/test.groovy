@@ -3,9 +3,9 @@
 // Define a function to check files and run the pipeline
 def call() {
 
-    def jenkinBuildPath = 'scripts/jenkin-build'
-    // def jenkinBuildPath = 'scripts/index.py'
-    def pipelineConfigPath = 'scripts/pipeline-config.yml'
+    def jenkinBuildPath = '.jenkins/jenkin-build'
+    // def jenkinBuildPath = '.jenkins/index.py'
+    def pipelineConfigPath = '.jenkins/pipeline-config.yml'
 
     pipeline {
         agent any
@@ -81,6 +81,12 @@ def call() {
 
                     // Deactivate the virtual environment using the deactivate function
                     sh 'deactivate || true' // Use '|| true' to ignore errors if deactivate fails
+                }
+            }
+
+            stage('CleanWorkspace') {
+                steps {
+                    cleanWs()
                 }
             }
         }

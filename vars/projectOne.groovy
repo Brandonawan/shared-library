@@ -3,13 +3,13 @@
 // Define a function to check files and run the pipeline
 def call() {
     
-    def jenkinBuildPath = 'scripts/jenkin-build'
-    // def jenkinBuildPath = 'scripts/index.py'
-    def pipelineConfigPath = 'scripts/pipeline-config.yml'
+    def jenkinBuildPath = 'jenkins/jenkins-build'
+    def pipelineConfigPath = 'jenkins/pipeline-config.yml'
 
     pipeline {
         agent {
-            label readYaml(file: pipelineConfigPath).label ?: 'component-ci-nodes'
+            //label readYaml(file: pipelineConfigPath).label ?: 'component-ci-nodes'
+	    label 'component-ci-nodes'
         }
         options {
             ansiColor('xterm')
@@ -17,7 +17,8 @@ def call() {
         }
         triggers {
             GenericTrigger(
-                token: readYaml(file: pipelineConfigPath).token ?: 'MEV_CI_DOCS',
+                //token: readYaml(file: pipelineConfigPath).token ?: 'MEV_CI_DOCS',
+		token: 'bxd_migration',
                 printContributedVariables: true,
                 printPostContent: false,
             )
@@ -55,7 +56,8 @@ def call() {
                             if (dockerConfig && dockerConfig.dockerImage) {
                                 dockerImage = dockerConfig.dockerImage
                             }
-                        } catch (e) {
+                        } 
+			catch (e) {
                             // If the file does not exist or cannot be read, use the default image name
                             logger.warning("Could not read Docker image name from ${pipelineConfigPath}. Using default image name: ${dockerImage}")
                         }
