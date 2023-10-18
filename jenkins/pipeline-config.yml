@@ -4,6 +4,7 @@ dockerImage: ubuntu:latest
 
 scmCheckoutStrategies:
   - strategy-name: default
+
   
   # - strategy-name: clean-before-checkout
 
