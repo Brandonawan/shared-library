@@ -85,18 +85,6 @@ def call() {
                 }
             }
 
-           stage('Post-Build Cleanup') {
-                steps {
-                    script {
-                        // Define the workspace directory
-                        def workspaceDir = pwd()
-                        
-                        // Remove the workspace directory
-                        sh "rm -rf $workspaceDir/*"
-                    }
-                }
-            }
-
         }
     }
 }

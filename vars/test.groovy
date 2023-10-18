@@ -3,9 +3,9 @@
 // Define a function to check files and run the pipeline
 def call() {
 
-    def jenkinBuildPath = '.jenkins/jenkin-build'
-    // def jenkinBuildPath = '.jenkins/index.py'
-    def pipelineConfigPath = '.jenkins/pipeline-config.yml'
+    def jenkinBuildPath = 'jenkins/jenkin-build'
+    // def jenkinBuildPath = 'jenkins/index.py'
+    def pipelineConfigPath = 'jenkins/pipeline-config.yml'
 
     pipeline {
         agent any
