@@ -73,10 +73,10 @@ def call() {
                     sh 'pip install -r requirements.txt'
 
                     // Run the script (adjust the command accordingly)
-                    sh "./${jenkinsBuildPath}"
+                    sh "./${jenkinsBuildPath}" || error("Error: Failed to execute '${jenkinsBuildPath}'. Refer to the documentation for guidance: [${confluenceDocLink}]")
 
                     // Deactivate the virtual environment using the deactivate function
-                    sh 'deactivate || true' // Use '|| true' to ignore errors if deactivate fails
+                    sh 'deactivate || true' || error("Error: Failed to deactivate virtual environment. Refer to the documentation for guidance: [${confluenceDocLink}]")
                 }
             }
 
