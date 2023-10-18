@@ -13,7 +13,6 @@ scmCheckoutStrategies:
     svn-repo-url: your-svn-repo-url
 
   - strategy-name: wipe-out-workspace
-    wipe-out-workspace: true
 
   - strategy-name: custom-checkout
     checkout-script-name: jenkins-checkout
