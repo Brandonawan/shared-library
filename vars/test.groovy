@@ -43,16 +43,6 @@ def call() {
                                         deleteDir()
                                         checkout scm
                                         break
-                                    case 'sparse-checkout':
-                                        checkout([$class: 'GitSCM', branches: [[name: strategy.gitBranch]],
-                                                  userRemoteConfigs: [[url: strategy.gitRepoUrl]],
-                                                  extensions: [[$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [[path: strategy.gitSparsePath]]]])
-                                        break
-                                    case 'lightweight-checkout':
-                                        checkout([$class: 'GitSCM', branches: [[name: strategy.gitBranch]],
-                                                  userRemoteConfigs: [[url: strategy.gitRepoUrl]],
-                                                  extensions: [[$class: 'CleanCheckout'], [$class: 'CloneOption', depth: 1]])
-                                        break
                                     case 'custom-checkout':
                                         sh "sh ${strategy.checkoutScriptName}"
                                         break
