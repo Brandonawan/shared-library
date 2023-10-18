@@ -13,15 +13,7 @@ scmCheckoutStrategies:
     svn-repo-url: your-svn-repo-url
 
   - strategy-name: wipe-out-workspace
-
-  - strategy-name: sparse-checkout
-    git-branch: main
-    git-repo-url: your-git-repo-url
-    git-sparse-path: subdirectory
-
-  - strategy-name: lightweight-checkout
-    git-branch: main
-    git-repo-url: your-git-repo-url
+    wipe-out-workspace: true
 
   - strategy-name: custom-checkout
     checkout-script-name: jenkins-checkout
