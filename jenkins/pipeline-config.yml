@@ -4,18 +4,17 @@ dockerImage: ubuntu:latest
 
 scmCheckoutStrategies:
   - strategy-name: default
-  - custom-workspace: custom-workspace  # Set a custom workspace directory
+  
+  # - strategy-name: clean-before-checkout
 
-  - strategy-name: clean-before-checkout
+  # - strategy-name: revert-before-update
+  #   svn-directory: your-svn-directory
+  #   svn-repo-url: your-svn-repo-url
 
-  - strategy-name: revert-before-update
-    svn-directory: your-svn-directory
-    svn-repo-url: your-svn-repo-url
+  # - strategy-name: wipe-out-workspace
 
-  - strategy-name: wipe-out-workspace
-
-  - strategy-name: custom-checkout
-    checkout-script-name: jenkins-checkout
+  # - strategy-name: custom-checkout
+  #   checkout-script-name: jenkins-checkout
 
 # dockerImage: artifacts-bxdsw.sc.intel.com:9444/mev/fedora:30
 
