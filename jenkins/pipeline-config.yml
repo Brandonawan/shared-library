@@ -1,6 +1,31 @@
 token: MEV_CI_DOCS
 label: component-ci-nodes
 dockerImage: ubuntu:latest
+
+scmCheckoutStrategies:
+  - strategy-name: default
+  - custom-workspace: custom-workspace  # Set a custom workspace directory
+
+  - strategy-name: clean-before-checkout
+
+  - strategy-name: revert-before-update
+    svn-directory: your-svn-directory
+    svn-repo-url: your-svn-repo-url
+
+  - strategy-name: wipe-out-workspace
+
+  - strategy-name: sparse-checkout
+    git-branch: main
+    git-repo-url: your-git-repo-url
+    git-sparse-path: subdirectory
+
+  - strategy-name: lightweight-checkout
+    git-branch: main
+    git-repo-url: your-git-repo-url
+
+  - strategy-name: custom-checkout
+    checkout-script-name: jenkins-checkout
+
 # dockerImage: artifacts-bxdsw.sc.intel.com:9444/mev/fedora:30
 
 
@@ -13,20 +38,20 @@ dockerImage: ubuntu:latest
 # how to get the code necessary for the build
 #scmCheckoutStrategy: -
 
-# supported values [scm-checkout:strategy(defautt), repo-tool-with-gh-token-strategy, custom:scm:checkout:strateay]
-scmCheckoutStrateay:
-- strategy-name: repo-tool-with-gh-token:sirategy.
-- github-token-ienkins-credential-id: afadfadfadfdaf
-- repo-manifest-url: github.comy/intel-innersource/networking.ipu. mountevans.manifests
-- repo-manifest-branch: mev-truck:idpf-test
-- repo-manifest-group: IDPF
+# supported values [scm-checkout:strategy(default), repo-tool-with-gh-token-strategy, custom:scm:checkout:strateay]
+# scmCheckoutStrateay:
+# - strategy-name: repo-tool-with-gh-token:sirategy.
+# - github-token-ienkins-credential-id: afadfadfadfdaf
+# - repo-manifest-url: github.comy/intel-innersource/networking.ipu. mountevans.manifests
+# - repo-manifest-branch: mev-truck:idpf-test
+# - repo-manifest-group: IDPF
 
-scmCheckoutStrateay:
-- strategy-name: custom:scm-checkout:strategy
-- checkout-script-name: jenkins-checkout
+# scmCheckoutStrateay:
+# - strategy-name: custom:scm-checkout:strategy
+# - checkout-script-name: jenkins-checkout
 
-scmCheckoutStrateay:
-- strategy-name: scm:checkout-strateay
+# scmCheckoutStrateay:
+# - strategy-name: scm:checkout-strateay
 
 # docker image url (required)
 
