@@ -21,42 +21,23 @@ def call() {
                 steps {
                     script {
                         def pipelineConfig = readYaml file: pipelineConfigPath
-                        def checkoutStrategy = pipelineConfig.scmCheckoutStrategy
+                        def checkoutStrategy = pipelineConfig.scmCheckoutStrategies
 
                         if (checkoutStrategy) {
-                            checkoutStrategy.each { strategy ->
-                                switch (strategy.strategyName) {
-                                    case 'default':
-                                        checkout scm
-                                        break
-                                    case 'clean-before-checkout':
-                                        deleteDir()
-                                        checkout scm
-                                        break
-                                    case 'revert-before-update':
-                                        dir(strategy.svnDirectory) {
-                                            sh "svn revert -R ."
-                                            checkout([$class: 'SubversionSCM', locations: [[remote: strategy.svnRepoUrl]]])
-                                        }
-                                        break
-                                    case 'wipe-out-workspace':
-                                        deleteDir()
-                                        checkout scm
-                                        break
-                                    case 'custom-checkout':
-                                        sh "sh ${strategy.checkoutScriptName}"
-                                        break
-                                    default:
-                                        error "Invalid checkout strategy: ${strategy.strategyName}"
-                                }
+                            def defaultStrategy = checkoutStrategy.find { it.strategyName == 'default' }
+
+                            if (defaultStrategy) {
+                                checkout scm
+                            } else {
+                                error "The 'default' checkout strategy is not defined in the configuration."
                             }
                         } else {
-                            error "No scmCheckoutStrategy defined in the configuration."
+                            error "No scmCheckoutStrategies defined in the configuration."
                         }
                     }
                 }
             }
-
+            
             stage('Check Files') {
                 steps {
                     script {
