@@ -18,25 +18,25 @@ def call() {
             //         checkout scm
             //     }
             stage('Checkout') {
-                    steps {
-                        script {
-                            def pipelineConfigContent = readFile(file: pipelineConfigPath)
-                            def pipelineConfig = evaluate(readYaml text: pipelineConfigContent)
+                steps {
+                    script {
+                        def pipelineConfigContent = readFile(file: pipelineConfigPath)
+                        def pipelineConfig = readYaml text: pipelineConfigContent
 
-                            if (pipelineConfig.scmCheckoutStrategies) {
-                                def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it.strategyName == 'default' }
+                        if (pipelineConfig.scmCheckoutStrategies) {
+                            def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
 
-                                if (defaultStrategy) {
-                                    checkout scm
-                                } else {
-                                    error "The 'default' checkout strategy is not defined in the configuration."
-                                }
+                            if (defaultStrategy) {
+                                checkout scm
                             } else {
-                                error "No scmCheckoutStrategies defined in the configuration."
+                                error "The 'default' checkout strategy is not defined in the configuration."
                             }
+                        } else {
+                            error "No scmCheckoutStrategies defined in the configuration."
                         }
                     }
                 }
+            }
             
             stage('Check Files') {
                 steps {
