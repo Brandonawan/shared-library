@@ -34,10 +34,11 @@ def call() {
                         } else {
                             error "No scmCheckoutStrategies defined in the configuration."
                         }
+
                     }
                 }
             }
-            
+
             stage('Check Files') {
                 steps {
                     script {
