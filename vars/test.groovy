@@ -83,9 +83,8 @@ def call() {
             stage('Clean Workspace') {
                 steps {
                     cleanWs()
-                    echo 'Workspace cleaned successfully'
-                    echo '${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully}'
-                    echo 'View Documentation: ${confluenceDocLink}'
+                    echo "${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully"
+                    echo "View Documentation: ${confluenceDocLink}"
                 }
             }
         }
