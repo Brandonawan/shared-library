@@ -3,8 +3,10 @@ label: component-ci-nodes
 dockerImage: ubuntu:latest
 
 scmCheckoutStrategies:
-  - strategy-name: custom-checkout
-    checkout-script-name: jenkins/custom-checkout.sh
+  - strategy-name: default
+  
+  # - strategy-name: custom-checkout
+  #   checkout-script-name: jenkins/custom-checkout.sh
 
   # - strategy-name: repo-tool-with-gh-token
   #   github-token-jenkins-credential-id: afadfadfadfdaf
@@ -13,8 +15,6 @@ scmCheckoutStrategies:
   #   repo-manifest-group: IDPF
 
 
-
-  # - strategy-name: default
 
 
 # dockerImage: artifacts-bxdsw.sc.intel.com:9444/mev/fedora:30
