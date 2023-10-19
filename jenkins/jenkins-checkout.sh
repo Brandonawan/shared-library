@@ -7,8 +7,6 @@
 # # Add any other custom checkout steps here
 
 
-#!/bin/bash
-
 # Get the current workspace directory
 WORKSPACE=`pwd`
 
