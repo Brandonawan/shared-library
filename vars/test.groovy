@@ -60,7 +60,15 @@ def call() {
                                             def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
                                             env.PATH = "${repoDir}:${env.PATH}"
                                         }
-                                        sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
+                                        // sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
+                                        sh """
+                                                repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']} \
+                                                --config-name github-token \
+                                                --repo-url https://github.com/ \
+                                                --no-repo-verify \
+                                                --repo-branch main \
+                                                --repo-clone-url https://oauth2:${GITHUB_TOKEN}@github.com/ \
+                                            """
                                         sh "repo sync"
                                     }
                                 }
