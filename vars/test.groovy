@@ -63,14 +63,15 @@ def call() {
                 steps {
                     echo "Starting 'git clone' stage"
 
-                    // Replace 'YOUR_TOKEN' with your actual personal access token
-                    sh "git clone https://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@github.com/axumt/axumt-shared-library.git"
+                    // Provide your GitHub token as a secret in the pipeline
+                    withCredentials([string(credentialsId: 'brandon-shared-library', variable: 'GITHUB_TOKEN')]) {
+                        sh "git clone https://github.com/axumt/axumt-shared-library.git"
+                    }
 
                     echo "git clone completed"
                 }
             }
-
-            
+  
             stage('Check Files') {
                 steps {
                     script {
