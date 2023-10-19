@@ -28,8 +28,10 @@ def call() {
                             def customStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'custom-checkout' }
 
                             if (defaultStrategy) {
+                                echo "Checking out using 'default' strategy."
                                 checkout scm
                             } else if (customStrategy) {
+                                echo "Checking out using 'custom-checkout' strategy."
                                 sh "${customStrategy['checkout-script-name']}"
                             } else {
                                 echo "No supported checkout strategy found in the configuration. Skipping checkout."
