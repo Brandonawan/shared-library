@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+​
+    <remote name="microsoft" fetch="https://github.com/microsoft" />
+    <remote name="kodekloudhub-ecommerce" fetch="https://github.com/kodekloudhub" />
+     <remote name="Azure" fetch="https://github.com/Azure" />
+      <remote name="spring-projects" fetch="https://github.com/spring-projects/" />
+​
+    <!-- Define individual Git repositories -->
+    <project name="project-html-website"
+             path="projects/project-html-website"
+             remote="microsoft"
+             revision="master"
+    />
+    
+    <project name="learning-app-ecommerce"
+             path="projects/learning-app-ecommerce"
+             remote="kodekloudhub-ecommerce"
+             revision="master"
+    />
+    
+    <project name="azure-notificationhubs-samples"
+             path="projects/azure-notificationhubs-samples"
+             remote="Azure"
+             revision="main"
+    />
+​
+    <project name="spring-webflow-samples.git"
+             path="projects/spring-webflow-samples.git"
+             remote="spring-projects"
+             revision="main"
+    />
+​
+</manifest>
