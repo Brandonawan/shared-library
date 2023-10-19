@@ -13,30 +13,6 @@ def call() {
             timestamps()
         }
         stages {
-            stage('Clean Workspace Befor Clone') {
-                steps {
-                    echo "Starting 'Clean Workspace' stage"
-                    cleanWs()
-                    echo "${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully"
-                    echo "View Documentation: ${confluenceDocLink}"
-                }
-            }
-            stage("git clone") {
-                steps {
-                    echo "Starting 'git clone' stage"
-
-                    // Provide your GitHub token as a secret in the pipeline
-                    withCredentials([string(credentialsId: 'token-brandon', variable: 'GITHUB_TOKEN')]) {
-                        sh "git clone git@github.com:axumt/axumt-shared-library.git"
-                    }
-
-                    sh "ls -al"
-                    sh "pwd"
-
-                    echo "git clone completed"
-                }
-            }
-
             stage('Checkout') {
                 steps {
                     script {
@@ -58,8 +34,11 @@ def call() {
                             } else if (repoToolStrategy) {
                                 echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
 
-                                // Install Repo tool if not already installed
-                                sh "if [ ! -f \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > /var/lib/jenkins/bin/repo; chmod +x /var/lib/jenkins/bin/repo; echo 'Repo tool installation completed.'; fi"
+                                // Fetch the GitHub token from Jenkins credentials
+                                withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
+                                    // Install Repo tool if not already installed
+                                    sh "if [ ! -f \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > /var/lib/jenkins/bin/repo; chmod +x /var/lib/jenkins/bin/repo; echo 'Repo tool installation completed.'; fi"
+                                }
 
                                 // Fetch the manifest repository
                                 dir('repo') {
