@@ -35,7 +35,7 @@ def call() {
                                 echo "Checking out using 'repo-tool-with-gh-token' strategy."
 
                                 // Install Repo tool if not already installed
-                                sh "if [ ! -d \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo; cchmod +x ~/bin/repo; fi"
+                                sh "if [ ! -f \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo; chmod +x ~/bin/repo; fi"
 
                                 // Fetch the manifest repository
                                 dir('repo') {
@@ -44,7 +44,7 @@ def call() {
                                 }
 
                                 // Checkout the specified manifest group
-                                sh "repo forall -c 'git checkout ${repoToolStrategy['repo-manifest-branch']}' -g ${repoToolStrategy['repo-manifest-group']}"
+                                // sh "repo forall -c 'git checkout ${repoToolStrategy['repo-manifest-branch']}' -g ${repoToolStrategy['repo-manifest-group']}"
                             } else {
                                 echo "No supported checkout strategy found in the configuration. Skipping checkout."
                             }
