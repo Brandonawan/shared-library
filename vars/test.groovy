@@ -35,10 +35,9 @@ def call() {
                                 echo "Checking out using 'repo-tool-with-gh-token' strategy."
 
                                 // Install Repo tool if not already installed
-                                sh "if [ ! -d \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > /usr/local/bin/repo; chmod a+x /usr/local/bin/repo; fi"
+                                sh "if [ ! -d \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo; cchmod +x ~/bin/repo; fi"
 
                                 // Fetch the manifest repository
-                                sh "mkdir repo"
                                 dir('repo') {
                                     sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
                                     sh "repo sync"

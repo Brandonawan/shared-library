@@ -3,16 +3,17 @@ label: component-ci-nodes
 dockerImage: ubuntu:latest
 
 scmCheckoutStrategies:
-  - strategy-name: default
+  - strategy-name: repo-tool-with-gh-token
+    repo-manifest-url: https://github.com/Brandonawan/shared-library.git
+    repo-manifest-branch: main
 
-  # - strategy-name: custom-checkout
-  #   checkout-script-name: jenkins/custom-checkout.sh
+    # github-token-jenkins-credential-id: afadfadfadfdaf
+    # repo-manifest-group: IDPF
 
-  # - strategy-name: repo-tool-with-gh-token
-  #   github-token-jenkins-credential-id: afadfadfadfdaf
-  #   repo-manifest-url: github.comy/intel-innersource/networking.ipu.mountevans.manifests
-  #   repo-manifest-branch: mev-trunk-idpf-test
-  #   repo-manifest-group: IDPF
+    # - strategy-name: default
+
+    # - strategy-name: custom-checkout
+    #   checkout-script-name: jenkins/custom-checkout.sh
 
 
 
