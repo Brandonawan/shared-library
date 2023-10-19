@@ -32,10 +32,22 @@ def call() {
                                 echo "Checking out Source Code using 'SCM custom-checkout' strategy."
                                 sh "./${customStrategy['checkout-script-name']}"
                             } else if (repoToolStrategy) {
-                                echo "Checking out using 'repo-tool-with-gh-token' strategy."
-
-                                // Install Repo tool if not already installed
-                                sh "if [ ! -f \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo; chmod +x ~/bin/repo; fi"
+                                // Check if the Repo tool is installed
+                                def repoToolInstalled = sh(script: "which repo", returnStatus: true)
+                                
+                                if (repoToolInstalled == 0) {
+                                    // Repo tool found, check the version
+                                    def repoToolVersion = sh(script: "repo --version", returnStdout: true).trim()
+                                    echo "Found Repo tool: $repoToolVersion"
+                                } else {
+                                    echo "Repo tool not found. Attempting to install..."
+                                    
+                                    // Install Repo tool
+                                    sh "curl https://storage.googleapis.com/git-repo-downloads/repo > /var/lib/jenkins/bin/repo"
+                                    sh "chmod +x /var/lib/jenkins/bin/repo"
+                                    
+                                    echo "Repo tool installation completed."
+                                }
 
                                 // Fetch the manifest repository
                                 dir('repo') {
@@ -54,7 +66,7 @@ def call() {
                     }
                 }
             }
-
+            
             stage('Check Files') {
                 steps {
                     script {
