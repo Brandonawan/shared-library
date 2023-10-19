@@ -5,7 +5,7 @@ def call() {
     def jenkinsBuildPath = 'jenkins/jenkin-build'
     def pipelineConfigPath = 'jenkins/pipeline-config.yml'
     def confluenceDocLink = 'https://your-confluence-link.com/documentation'
-    def customCheckoutScriptName = 'custom-checkout.sh'
+    def customCheckoutScriptName = 'jenkins/custom-checkout.sh'
 
     pipeline {
         agent any
