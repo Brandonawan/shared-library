@@ -4,9 +4,7 @@ dockerImage: ubuntu:latest
 
 scmCheckoutStrategies:
   - strategy-name: custom-checkout
-    checkout-script-name: jenkins-checkout.sh
-    checkout-directory: Brandon
-
+    checkout-script-name: jenkins/jenkins-checkout.sh
 
   # - strategy-name: default
 
