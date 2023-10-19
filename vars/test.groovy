@@ -47,8 +47,10 @@ def call() {
                                         def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
                                         env.PATH = "${repoDir}:${env.PATH}"
                                     }
-                                    sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
-                                    sh "repo sync"
+                                    withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
+                                        sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']} --repo-url=${repoToolStrategy['repo-url']} --repo-branch=${repoToolStrategy['repo-branch']} --repo-rev=${repoToolStrategy['repo-rev']} --repo-token=${GITHUB_TOKEN}"
+                                        sh "repo sync"
+                                    }
                                 }
 
                                 // Checkout the specified manifest group (uncomment if needed)
