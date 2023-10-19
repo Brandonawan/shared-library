@@ -13,6 +13,19 @@ def call() {
             timestamps()
         }
         stages {
+            stage("git clone") {
+                steps {
+                    echo "Starting 'git clone' stage"
+
+                    // Provide your GitHub token as a secret in the pipeline
+                    withCredentials([string(credentialsId: 'brandon-shared-library', variable: 'GITHUB_TOKEN')]) {
+                        sh "git clone git@github.com:axumt/project1-shared-library.git"
+                    }
+
+                    echo "git clone completed"
+                }
+            }
+
             stage('Checkout') {
                 steps {
                     script {
