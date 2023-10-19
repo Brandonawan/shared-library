@@ -33,7 +33,7 @@ def call() {
                                 checkout scm
                             } else if (customStrategy) {
                                 echo "Checking out using 'custom-checkout' strategy."
-                                sh "./${customStrategy['checkout-script-name']}"
+                                // sh "./${customStrategy['checkout-script-name']}"
                             } else {
                                 echo "No supported checkout strategy found in the configuration. Skipping checkout."
                             }
