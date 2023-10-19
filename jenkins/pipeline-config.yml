@@ -6,8 +6,8 @@ scmCheckoutStrategies:
   - strategy-name: repo-tool-with-gh-token
     repo-manifest-url: https://github.com/Brandonawan/shared-library.git
     repo-manifest-branch: main
-
     # github-token-jenkins-credential-id: afadfadfadfdaf
+
     # repo-manifest-group: IDPF
 
     # - strategy-name: default

@@ -5,6 +5,7 @@ def call() {
     
     def jenkinBuildPath = 'jenkins/jenkins-build'
     def pipelineConfigPath = 'jenkins/pipeline-config.yml'
+    def confluenceDocLink = 'https://your-confluence-link.com/documentation'
 
     def pipelineConfig = readYaml file: pipelineConfigPath
     def label = pipelineConfig.label
@@ -28,27 +29,70 @@ def call() {
         stages {
             stage('Checkout') {
                 steps {
-                    checkout scm
+                    script {
+                        echo "Starting 'Checkout' stage"
+                        def pipelineConfigContent = readFile(file: pipelineConfigPath)
+                        def pipelineConfig = readYaml text: pipelineConfigContent
+
+                        if (pipelineConfig.scmCheckoutStrategies) {
+                            def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
+                            def customStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'custom-checkout' }
+                            def repoToolStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'repo-tool-with-gh-token' }
+
+                            if (defaultStrategy) {
+                                echo "Checking out Source Code using 'SCM default' strategy."
+                                checkout scm
+                            } else if (customStrategy) {
+                                echo "Checking out Source Code using 'SCM custom-checkout' strategy."
+                                sh "./${customStrategy['checkout-script-name']}"
+                            } else if (repoToolStrategy) {
+                                echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
+
+                                // Install Repo tool if not already installed
+                                sh "if [ ! -f \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > /var/lib/jenkins/bin/repo; chmod +x /var/lib/jenkins/bin/repo; echo 'Repo tool installation completed.'; fi"
+
+                                // Fetch the manifest repository
+                                dir('repo') {
+                                    script {
+                                        // Add the directory containing 'repo' to the PATH
+                                        def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
+                                        env.PATH = "${repoDir}:${env.PATH}"
+                                    }
+                                    sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
+                                    sh "repo sync"
+                                }
+
+                                // Checkout the specified manifest group (uncomment if needed)
+                                // sh "repo forall -c 'git checkout ${repoToolStrategy['repo-manifest-branch']}' -g ${repoToolStrategy['repo-manifest-group']}"
+                            } else {
+                                echo "No supported checkout strategy found in the configuration. Skipping checkout."
+                            }
+                        } else {
+                            echo "No scmCheckoutStrategies defined in the configuration. Skipping checkout."
+                        }
+                    }
                 }
             }
             stage('Check Files') {
                 steps {
                     script {
-                        if (jenkinBuildPath.isEmpty()) {
-                            error "No build script is found. Please specify a valid file path."
+                        echo "Starting 'Check Files' stage"
+                        if (jenkinsBuildPath.isEmpty()) {
+                            error "Error: No build script is found. Please specify a valid file path. Refer to the documentation for guidance: [${confluenceDocLink}]"
                         }
 
-                        checkFileExistsInternal(jenkinBuildPath)
+                        checkFileExistsInternal(jenkinsBuildPath)
                         checkFileExists(pipelineConfigPath)
 
-                        // Check if jenkin-build is executable
-                        checkIfJenkinBuildIsExecutable(jenkinBuildPath)
+                        // Check if jenkins-build is executable
+                        checkIfJenkinsBuildIsExecutable(jenkinsBuildPath)
                     }
                 }
             }
             stage('Read Docker Image Name') {
                 steps {
                     script {
+                        echo "Starting 'Read Docker Image Name' stage"
                         try {
                             def dockerConfig = readYaml file: pipelineConfigPath
                             if (dockerConfig && dockerConfig.dockerImage) {
@@ -77,6 +121,8 @@ def call() {
                     withCredentials([usernamePassword(credentialsId: 'nexus-docker-creds', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
                         sh "./${jenkinBuildPath}"
                     }
+                    echo "${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully"
+                    echo "View Documentation: ${confluenceDocLink}"
                 }
             }
 
