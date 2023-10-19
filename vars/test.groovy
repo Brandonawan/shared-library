@@ -5,7 +5,6 @@ def call() {
     def jenkinsBuildPath = 'jenkins/jenkin-build'
     def pipelineConfigPath = 'jenkins/pipeline-config.yml'
     def confluenceDocLink = 'https://your-confluence-link.com/documentation'
-    def customCheckoutScriptName = 'jenkins/custom-checkout.sh'
 
     pipeline {
         agent any
@@ -33,8 +32,8 @@ def call() {
                                 checkout scm
                             } else if (customStrategy) {
                                 echo "Checking out using 'custom-checkout' strategy."
-                                // sh "./${customStrategy['checkout-script-name']}"
-                                sh "./${customCheckoutScriptName}"
+                                sh "./${customStrategy['checkout-script-name']}"
+                                // sh "./${customCheckoutScriptName}"
                             } else {
                                 echo "No supported checkout strategy found in the configuration. Skipping checkout."
                             }
