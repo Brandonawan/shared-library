@@ -45,27 +45,25 @@ def call() {
                                 echo "Checking out Source Code using 'SCM custom-checkout' strategy."
                                 sh "./${customStrategy['checkout-script-name']}"
                             } else if (repoToolStrategy) {
-    echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
+                                echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
 
-    // Install Repo tool if not already installed
-    sh "if [ ! -f \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > /var/lib/jenkins/bin/repo; chmod +x /var/lib/jenkins/bin/repo; echo 'Repo tool installation completed.'; fi"
+                                // Fetch the GitHub token from Jenkins credentials
+                                withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
+                                        // Install Repo tool if not already installed
+                                        sh "if [ ! -f \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > /var/lib/jenkins/bin/repo; chmod +x /var/lib/jenkins/bin/repo; echo 'Repo tool installation completed.'; fi"
+                                    
 
-    // Set the GitHub token as an environment variable
-    withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
-        env.GITHUB_TOKEN = sh(script: 'echo $GITHUB_TOKEN', returnStdout: true).trim()
-    }
-
-    // Fetch the manifest repository
-    dir('repo') {
-        script {
-            // Add the directory containing 'repo' to the PATH
-            def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
-            env.PATH = "${repoDir}:${env.PATH}"
-        }
-        sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']} -t $GITHUB_TOKEN"
-        sh "repo sync -t $GITHUB_TOKEN"
-    }
-}
+                                    // Fetch the manifest repository
+                                    dir('repo') {
+                                        script {
+                                            // Add the directory containing 'repo' to the PATH
+                                            def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
+                                            env.PATH = "${repoDir}:${env.PATH}"
+                                        }
+                                        sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
+                                        sh "repo sync"
+                                    }
+                                }
 
                                 // Checkout the specified manifest group (uncomment if needed)
                                 // sh "repo forall -c 'git checkout ${repoToolStrategy['repo-manifest-branch']}' -g ${repoToolStrategy['repo-manifest-group']}"
