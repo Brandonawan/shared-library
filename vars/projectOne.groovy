@@ -6,10 +6,13 @@ def call() {
     def jenkinBuildPath = 'jenkins/jenkins-build'
     def pipelineConfigPath = 'jenkins/pipeline-config.yml'
 
+    def pipelineConfig = readYaml file: pipelineConfigPath
+    def label = pipelineConfig.label
+    def token = pipelineConfig.token
+
     pipeline {
         agent {
-            //label readYaml(file: pipelineConfigPath).label ?: 'component-ci-nodes'
-	    label 'component-ci-nodes'
+	    label label
         }
         options {
             ansiColor('xterm')
@@ -17,8 +20,7 @@ def call() {
         }
         triggers {
             GenericTrigger(
-                //token: readYaml(file: pipelineConfigPath).token ?: 'MEV_CI_DOCS',
-		token: 'bxd_migration',
+		        token: token,
                 printContributedVariables: true,
                 printPostContent: false,
             )
@@ -47,23 +49,16 @@ def call() {
             stage('Read Docker Image Name') {
                 steps {
                     script {
-                        // Set the default Docker image name
-                        def dockerImage = 'ubuntu:latest'
-
-                        // Try to read the Docker image name from the pipeline-config.yml file
                         try {
                             def dockerConfig = readYaml file: pipelineConfigPath
                             if (dockerConfig && dockerConfig.dockerImage) {
-                                dockerImage = dockerConfig.dockerImage
+                                env.DOCKER_IMAGE = dockerConfig.dockerImage
+                            } else {
+                                error "Error: Docker image name not found in ${pipelineConfigPath}. Please specify a Docker image name in the configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
                             }
-                        } 
-			catch (e) {
-                            // If the file does not exist or cannot be read, use the default image name
-                            logger.warning("Could not read Docker image name from ${pipelineConfigPath}. Using default image name: ${dockerImage}")
+                        } catch (e) {
+                            error "Error: Could not read Docker image name from ${pipelineConfigPath}. Please check the configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
                         }
-
-                        // Set the Docker image name as an environment variable
-                        env.DOCKER_IMAGE = dockerImage
                     }
                 }
             }
