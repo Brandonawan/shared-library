@@ -33,7 +33,8 @@ def call() {
                             } else if (customStrategy) {
                                 def checkoutDirectory = customStrategy['checkout-directory'] ?: 'Brandon'
                                 sh "mkdir -p ${checkoutDirectory}"
-                                sh "cd ${checkoutDirectory} && sh ${customStrategy['checkout-script-name']}"
+                                def checkoutScriptName = customStrategy['checkout-script-name']
+                                sh "cd ${checkoutDirectory} && sh "./${checkoutScriptName}""
                                 echo "Checking out using 'custom-checkout' strategy."
                                 // sh "${customStrategy['checkout-script-name']}"
                             } else {
