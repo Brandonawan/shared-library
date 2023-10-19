@@ -22,6 +22,9 @@ def call() {
                         sh "git clone git@github.com:axumt/axumt-shared-library.git"
                     }
 
+                    sh "ls -al"
+                    sh "pwd"
+
                     echo "git clone completed"
                 }
             }
