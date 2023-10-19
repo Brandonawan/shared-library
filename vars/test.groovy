@@ -18,7 +18,7 @@ def call() {
                     echo "Starting 'git clone' stage"
 
                     // Provide your GitHub token as a secret in the pipeline
-                    withCredentials([string(credentialsId: 'brandon-shared-library', variable: 'GITHUB_TOKEN')]) {
+                    withCredentials([string(credentialsId: 'brandon-shared-libraryjjj', variable: 'GITHUB_TOKEN')]) {
                         sh "git clone git@github.com:axumt/project1-shared-library.git"
                     }
 
