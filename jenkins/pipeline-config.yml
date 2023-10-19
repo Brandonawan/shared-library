@@ -6,17 +6,7 @@ scmCheckoutStrategies:
   - strategy-name: custom-checkout
     checkout-script-name: jenkins/custom-checkout.sh
 
-  # - strategy-name: default
-
-  
-  # - strategy-name: clean-before-checkout
-
-  # - strategy-name: revert-before-update
-  #   svn-directory: your-svn-directory
-  #   svn-repo-url: your-svn-repo-url
-
-  # - strategy-name: wipe-out-workspace
-
+# - strategy-name: default
 
 
 # dockerImage: artifacts-bxdsw.sc.intel.com:9444/mev/fedora:30
