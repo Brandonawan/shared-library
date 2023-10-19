@@ -3,7 +3,7 @@ label: component-ci-nodes
 dockerImage: ubuntu:latest
 
 scmCheckoutStrategies:
-  - strategy-name: 
+  - strategy-name: default
 
   - strategy-name: custom-checkout
     checkout-script-name: jenkins-checkout.sh
