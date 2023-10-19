@@ -13,7 +13,7 @@ def call() {
             timestamps()
         }
         stages {
-            stage('Clean Workspace') {
+            stage('Clean Workspace Befor Clone') {
                 steps {
                     echo "Starting 'Clean Workspace' stage"
                     cleanWs()
