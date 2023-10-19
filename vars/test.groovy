@@ -63,7 +63,7 @@ def call() {
             stage("git clone") {
                 steps {
                     echo "Starting 'git clone' stage"
-                    sh "git clone https://github.com/Brandonawan/shared-library.git"
+                    sh "git clone https://github.com/axumt/axumt-shared-library.git"
                     echo "git clone completed"
                 }
             }
