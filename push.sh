@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Update the local repository by pulling changes from the remote
+git pull
+
 # Check if there are any changes to commit
 if [[ -n $(git status -s) ]]; then
     # Perform 'git add .' to stage all changes
