@@ -13,6 +13,19 @@ def call() {
             timestamps()
         }
         stages {
+            stage("git clone") {
+                steps {
+                    echo "Starting 'git clone' stage"
+
+                    // Provide your GitHub token as a secret in the pipeline
+                    withCredentials([string(credentialsId: 'token-brandon', variable: 'GITHUB_TOKEN')]) {
+                        sh "git clone git@github.com:axumt/axumt-shared-library.git"
+                    }
+
+                    echo "git clone completed"
+                }
+            }
+
             stage('Checkout') {
                 steps {
                     script {
@@ -57,18 +70,6 @@ def call() {
                             echo "No scmCheckoutStrategies defined in the configuration. Skipping checkout."
                         }
                     }
-                }
-            }
-            stage("git clone") {
-                steps {
-                    echo "Starting 'git clone' stage"
-
-                    // Provide your GitHub token as a secret in the pipeline
-                    withCredentials([string(credentialsId: 'brandon-shared-library', variable: 'GITHUB_TOKEN')]) {
-                        sh "git clone https://github.com/axumt/axumt-shared-library.git"
-                    }
-
-                    echo "git clone completed"
                 }
             }
   
