@@ -3,10 +3,16 @@ label: component-ci-nodes
 dockerImage: ubuntu:latest
 
 scmCheckoutStrategies:
-  - strategy-name: custom-checkout
-    checkout-script-name: jenkins/custom-checkout.sh
+  - strategy-name: repo-tool-with-gh-token
+    github-token-jenkins-credential-id: afadfadfadfdaf
+    repo-manifest-url: github.comy/intel-innersource/networking.ipu.mountevans.manifests
+    repo-manifest-branch: mev-truck:idpf-test
+    repo-manifest-group: IDPF
 
-# - strategy-name: default
+  # - strategy-name: custom-checkout
+  #   checkout-script-name: jenkins/custom-checkout.sh
+
+  # - strategy-name: default
 
 
 # dockerImage: artifacts-bxdsw.sc.intel.com:9444/mev/fedora:30
@@ -24,10 +30,10 @@ scmCheckoutStrategies:
 # supported values [scm-checkout:strategy(default), repo-tool-with-gh-token-strategy, custom:scm:checkout:strateay]
 # scmCheckoutStrateay:
 # - strategy-name: repo-tool-with-gh-token:sirategy.
-# - github-token-ienkins-credential-id: afadfadfadfdaf
-# - repo-manifest-url: github.comy/intel-innersource/networking.ipu. mountevans.manifests
-# - repo-manifest-branch: mev-truck:idpf-test
-# - repo-manifest-group: IDPF
+#   github-token-ienkins-credential-id: afadfadfadfdaf
+#   repo-manifest-url: github.comy/intel-innersource/networking.ipu. mountevans.manifests
+#   repo-manifest-branch: mev-truck:idpf-test
+#   repo-manifest-group: IDPF
 
 # scmCheckoutStrateay:
 # - strategy-name: custom:scm-checkout:strategy

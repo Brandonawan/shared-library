@@ -17,6 +17,33 @@ def call() {
             //     steps {
             //         checkout scm
             //     }
+            // stage('Checkout') {
+            //     steps {
+            //         script {
+            //             def pipelineConfigContent = readFile(file: pipelineConfigPath)
+            //             def pipelineConfig = readYaml text: pipelineConfigContent
+
+            //             if (pipelineConfig.scmCheckoutStrategies) {
+            //                 def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
+            //                 def customStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'custom-checkout' }
+
+            //                 if (defaultStrategy) {
+            //                     echo "Checking out using 'default' strategy."
+            //                     checkout scm
+            //                 } else if (customStrategy) {
+            //                     echo "Checking out using 'custom-checkout' strategy."
+            //                     sh "./${customStrategy['checkout-script-name']}"
+            //                     // sh "./${customCheckoutScriptName}"
+            //                 } else {
+            //                     echo "No supported checkout strategy found in the configuration. Skipping checkout."
+            //                 }
+            //             } else {
+            //                 echo "No scmCheckoutStrategies defined in the configuration. Skipping checkout."
+            //             }
+            //         }
+            //     }
+            // }
+
             stage('Checkout') {
                 steps {
                     script {
@@ -26,6 +53,7 @@ def call() {
                         if (pipelineConfig.scmCheckoutStrategies) {
                             def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
                             def customStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'custom-checkout' }
+                            def repoToolStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'repo-tool-with-gh-token' }
 
                             if (defaultStrategy) {
                                 echo "Checking out using 'default' strategy."
@@ -33,7 +61,21 @@ def call() {
                             } else if (customStrategy) {
                                 echo "Checking out using 'custom-checkout' strategy."
                                 sh "./${customStrategy['checkout-script-name']}"
-                                // sh "./${customCheckoutScriptName}"
+                            } else if (repoToolStrategy) {
+                                echo "Checking out using 'repo-tool-with-gh-token' strategy."
+
+                                // Install Repo tool if not already installed
+                                sh "if [ ! -d \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > /usr/local/bin/repo; chmod a+x /usr/local/bin/repo; fi"
+
+                                // Fetch the manifest repository
+                                sh "mkdir repo"
+                                dir('repo') {
+                                    sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
+                                    sh "repo sync"
+                                }
+
+                                // Checkout the specified manifest group
+                                sh "repo forall -c 'git checkout ${repoToolStrategy['repo-manifest-branch']}' -g ${repoToolStrategy['repo-manifest-group']}"
                             } else {
                                 echo "No supported checkout strategy found in the configuration. Skipping checkout."
                             }
