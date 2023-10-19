@@ -13,6 +13,14 @@ def call() {
             timestamps()
         }
         stages {
+            stage('Clean Workspace') {
+                steps {
+                    echo "Starting 'Clean Workspace' stage"
+                    cleanWs()
+                    echo "${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully"
+                    echo "View Documentation: ${confluenceDocLink}"
+                }
+            }
             stage("git clone") {
                 steps {
                     echo "Starting 'git clone' stage"
