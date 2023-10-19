@@ -31,8 +31,11 @@ def call() {
                                 echo "Checking out using 'default' strategy."
                                 checkout scm
                             } else if (customStrategy) {
+                                def checkoutDirectory = customStrategy['checkout-directory'] ?: 'Brandon'
+                                sh "mkdir -p ${checkoutDirectory}"
+                                sh "cd ${checkoutDirectory} && sh ${customStrategy['checkout-script-name']}"
                                 echo "Checking out using 'custom-checkout' strategy."
-                                sh "${customStrategy['checkout-script-name']}"
+                                // sh "${customStrategy['checkout-script-name']}"
                             } else {
                                 echo "No supported checkout strategy found in the configuration. Skipping checkout."
                             }
