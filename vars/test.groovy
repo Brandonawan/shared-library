@@ -13,18 +13,18 @@ def call() {
             timestamps()
         }
         stages {
-            stage("git clone") {
-                steps {
-                    echo "Starting 'git clone' stage"
+            // stage("git clone") {
+            //     steps {
+            //         echo "Starting 'git clone' stage"
 
-                    // Provide your GitHub token as a secret in the pipeline
-                    withCredentials([string(credentialsId: 'brandon-shared-libraryjjj', variable: 'GITHUB_TOKEN')]) {
-                        sh "git clone git@github.com:axumt/project1-shared-library.git"
-                    }
+            //         // Provide your GitHub token as a secret in the pipeline
+            //         withCredentials([string(credentialsId: 'brandon-shared-libraryjjj', variable: 'GITHUB_TOKEN')]) {
+            //             sh "git clone git@github.com:axumt/project1-shared-library.git"
+            //         }
 
-                    echo "git clone completed"
-                }
-            }
+            //         echo "git clone completed"
+            //     }
+            // }
 
             stage('Checkout') {
                 steps {
@@ -60,7 +60,7 @@ def call() {
                                         def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
                                         env.PATH = "${repoDir}:${env.PATH}"
                                     }
-                                    withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
+                                    withCredentials([string(credentialsId: 'brandon-shared-library', variable: 'GITHUB_TOKEN')]) {
                                         sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
                                         sh "repo sync"
                                     }
