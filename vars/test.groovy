@@ -25,19 +25,22 @@ def call() {
 
                         if (pipelineConfig.scmCheckoutStrategies) {
                             def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
+                            def customStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'custom-checkout' }
 
                             if (defaultStrategy) {
                                 checkout scm
+                            } else if (customStrategy) {
+                                sh "${customStrategy['checkout-script-name']}"
                             } else {
-                                error "The 'default' checkout strategy is not defined in the configuration."
+                                echo "No supported checkout strategy found in the configuration. Skipping checkout."
                             }
                         } else {
-                            error "No scmCheckoutStrategies defined in the configuration."
+                            echo "No scmCheckoutStrategies defined in the configuration. Skipping checkout."
                         }
                     }
                 }
             }
-            
+
             stage('Check Files') {
                 steps {
                     script {
