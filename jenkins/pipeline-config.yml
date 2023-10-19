@@ -6,7 +6,7 @@ scmCheckoutStrategies:
   - strategy-name: custom-checkout
     checkout-script-name: jenkins-checkout.sh
 
-  - strategy-name: default
+  # - strategy-name: default
 
   
   # - strategy-name: clean-before-checkout
