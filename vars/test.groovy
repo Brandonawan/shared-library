@@ -12,6 +12,22 @@ def call() {
             timestamps()
         }
         stages {
+            stage('Clone Repository') {
+                steps {
+                    script {
+                        // Define the Git repository URL
+                        def gitRepoUrl = 'https://github.com/axumt/project1-shared-library.git'
+
+                        // Define the credentials ID for the Git token
+                        def credentialsId = 'Brandon-token' // Replace with the actual ID
+
+                        // Clone the Git repository using the token from the credentials
+                        withCredentials([string(credentialsId: credentialsId, variable: 'GIT_TOKEN')]) {
+                            sh "git clone ${gitRepoUrl}"
+                        }
+                    }
+                }
+            }
             stage('Check Files') {
                 steps {
                     script {
