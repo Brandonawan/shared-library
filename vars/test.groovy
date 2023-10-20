@@ -46,8 +46,14 @@ def call() {
                                             env.PATH = "${repoDir}:${env.PATH}"
                                         }
                                         // Use GITHUB_TOKEN in the repo init command
-                                        sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']} --reference=$GITHUB_TOKEN"
+                                        // sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']} --reference=$GITHUB_TOKEN"
+                                        // sh "repo sync"
+                                        // Use Git credential helper to set up authentication
+                                        sh "git config --global credential.helper '!f() { echo username=token; echo password=${GITHUB_TOKEN}; }; f'"
+                                        // Initialize repo tool and fetch the manifest repository
+                                        sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
                                         sh "repo sync"
+
                                     }
                                 }
                             } else {
