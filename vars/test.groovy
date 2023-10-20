@@ -25,6 +25,9 @@ def call() {
                         withCredentials([string(credentialsId: credentialsId, variable: 'GIT_TOKEN')]) {
                             sh "git clone ${gitRepoUrl}"
                         }
+
+                        // print the content of the cloned repository
+                        sh 'pwd'
                     }
                 }
             }
