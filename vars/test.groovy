@@ -36,6 +36,7 @@ def call() {
 
                                 // Install Repo tool if not already installed
                                 sh "if [ ! -f \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > /var/lib/jenkins/bin/repo; chmod +x /var/lib/jenkins/bin/repo; echo 'Repo tool installation completed.'; fi"
+                            
 
                                 // Fetch the manifest repository
                                 dir('repo') {
@@ -44,13 +45,9 @@ def call() {
                                         def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
                                         env.PATH = "${repoDir}:${env.PATH}"
                                     }
-                                    
-                                    // Retrieve GitHub token from Jenkins credentials
                                     withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
-                                        // Use the token in the Git URL
-                                        sh "git config --global credential.username ${GITHUB_TOKEN}"
-                                        sh "git config --global credential.helper store"
-                                        sh "repo init -u https://github.com/axumt/project1-shared-library.git -b ${repoToolStrategy['repo-manifest-branch']}"
+                                        // sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
+                                        sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']} -t \$GITHUB_TOKEN"
                                         sh "repo sync"
                                     }
                                 }
@@ -65,56 +62,6 @@ def call() {
                     }
                 }
             }
-
-            // stage('Checkout') {
-            //     steps {
-            //         script {
-            //             echo "Starting 'Checkout' stage"
-            //             def pipelineConfigContent = readFile(file: pipelineConfigPath)
-            //             def pipelineConfig = readYaml text: pipelineConfigContent
-
-            //             if (pipelineConfig.scmCheckoutStrategies) {
-            //                 def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
-            //                 def customStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'custom-checkout' }
-            //                 def repoToolStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'repo-tool-with-gh-token' }
-
-            //                 if (defaultStrategy) {
-            //                     echo "Checking out Source Code using 'SCM default' strategy."
-            //                     checkout scm
-            //                 } else if (customStrategy) {
-            //                     echo "Checking out Source Code using 'SCM custom-checkout' strategy."
-            //                     sh "./${customStrategy['checkout-script-name']}"
-            //                 } else if (repoToolStrategy) {
-            //                     echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
-
-            //                     // Install Repo tool if not already installed
-            //                     sh "if [ ! -f \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > /var/lib/jenkins/bin/repo; chmod +x /var/lib/jenkins/bin/repo; echo 'Repo tool installation completed.'; fi"
-                            
-
-            //                     // Fetch the manifest repository
-            //                     dir('repo') {
-            //                         script {
-            //                             // Add the directory containing 'repo' to the PATH
-            //                             def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
-            //                             env.PATH = "${repoDir}:${env.PATH}"
-            //                         }
-            //                         withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
-            //                             // sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
-            //                             sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']} -t \$GITHUB_TOKEN"
-            //                             sh "repo sync"
-            //                         }
-            //                     }
-            //                     // Checkout the specified manifest group (uncomment if needed)
-            //                     // sh "repo forall -c 'git checkout ${repoToolStrategy['repo-manifest-branch']}' -g ${repoToolStrategy['repo-manifest-group']}"
-            //                 } else {
-            //                     echo "No supported checkout strategy found in the configuration. Skipping checkout."
-            //                 }
-            //             } else {
-            //                 echo "No scmCheckoutStrategies defined in the configuration. Skipping checkout."
-            //             }
-            //         }
-            //     }
-            // }
   
             stage('Check Files') {
                 steps {
