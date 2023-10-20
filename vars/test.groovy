@@ -39,8 +39,6 @@ def call() {
                         echo "Starting 'Validate YAML Configuration' stage"
 
                         try {
-                            def pipelineConfigContent = readFile(file: pipelineConfigPath)
-                            def pipelineConfig = readYaml text: pipelineConfigContent
 
                             if (!pipelineConfig.token) {
                                 error "Error: 'token' key is missing or misconfigured in the YAML configuration. Please verify the 'token' key in your configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
