@@ -12,13 +12,13 @@ def call() {
             timestamps()
         }
         stages {
-            stage('Checkout') {
-                steps {
-                    withCredentials([string(credentialsId: 'brandon-shared-library', variable: 'GITHUB_TOKEN')]) {
-                        sh "git clone https://Brandonawan:${GITHUB_TOKEN}@github.com/repo-tool.git"
-                    }
+            stage('Clone Repository') { // Renamed from 'Checkout'
+            steps {
+                withCredentials([string(credentialsId: 'brandon-shared-library', variable: 'GITHUB_TOKEN')]) {
+                    sh "git clone https://Brandonawan:${GITHUB_TOKEN}@github.com/repo-tool.git"
                 }
             }
+        }
 
             stage('Check Files') {
                 steps {
