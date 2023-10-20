@@ -13,23 +13,21 @@ def call() {
         }
         stages {
             stage('Clone Repository') {
-                steps {
-                    script {
-                        // Define the Git repository URL
-                        def gitRepoUrl = 'https://github.com/Brandonawan/repo-tool.git'
+                        steps {
+                            script {
+                                // Define the credentials ID for the Git token
+                                def credentialsId = 'brandon-shared-library' // Replace with the actual ID
 
-                        // Define the credentials ID for the Git token
-                        def credentialsId = 'brandon-shared-library' // Replace with the actual ID
+                                // Use the $GIT_TOKEN variable in the Git URL
+                                def gitRepoUrl = "https://$GIT_TOKEN@github.com/Brandonawan/repo-tool.git"
 
-                        // Clone the Git repository using the token from the credentials
-                        withCredentials([string(credentialsId: credentialsId, variable: 'GIT_TOKEN')]) {
-                            sh "git clone ${gitRepoUrl}"
+                                // Clone the Git repository using the updated URL
+                                sh "git clone ${gitRepoUrl}"
+
+                                // Print the content of the cloned repository
+                                sh 'pwd'
+                            }
                         }
-
-                        // print the content of the cloned repository
-                        sh 'pwd'
-                    }
-                }
             }
             stage('Check Files') {
                 steps {
