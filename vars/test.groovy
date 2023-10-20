@@ -14,7 +14,7 @@ def call() {
         stages {
             stage('Clone Repository') {
                 steps {
-                    withCredentials([string(credentialsId: 'brandon-shared-library	', variable: 'GIT_CREDENTIAL')]) {
+                    withCredentials([string(credentialsId: 'token-brandon', variable: 'GIT_CREDENTIAL')]) {
                         sh "git clone https://github.com/axumt/project1-shared-library.git"
                     }
                 }
