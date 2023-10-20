@@ -16,7 +16,7 @@ def call() {
                 steps {
                     script {
                         // Define the Git repository URL
-                        def gitRepoUrl = 'git@github.com:Brandonawan/repo-tool.git'
+                        def gitRepoUrl = 'https://github.com/Brandonawan/repo-tool.git'
 
                         // Define the credentials ID for the Git token
                         def credentialsId = 'brandon-shared-library' // Replace with the actual ID
