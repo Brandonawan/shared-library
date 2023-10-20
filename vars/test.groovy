@@ -47,32 +47,22 @@ def call() {
                             } else if (repoToolStrategy) {
                                 echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
 
-                                // Fetch the GitHub token from Jenkins credentials
-                                withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
-                                        // Install Repo tool if not already installed
-                                        sh "if [ ! -f \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > /var/lib/jenkins/bin/repo; chmod +x /var/lib/jenkins/bin/repo; echo 'Repo tool installation completed.'; fi"
-                                    
+                                // Install Repo tool if not already installed
+                                sh "if [ ! -f \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > /var/lib/jenkins/bin/repo; chmod +x /var/lib/jenkins/bin/repo; echo 'Repo tool installation completed.'; fi"
+                            
 
-                                    // Fetch the manifest repository
-                                    dir('repo') {
-                                        script {
-                                            // Add the directory containing 'repo' to the PATH
-                                            def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
-                                            env.PATH = "${repoDir}:${env.PATH}"
-                                        }
-                                        // sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
-                                        sh """
-                                                repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']} \
-                                                --config-name github-token \
-                                                --repo-url https://github.com/ \
-                                                --no-repo-verify \
-                                                --repo-branch main \
-                                                --repo-clone-url https://oauth2:${GITHUB_TOKEN}@github.com/ \
-                                            """
+                                // Fetch the manifest repository
+                                dir('repo') {
+                                    script {
+                                        // Add the directory containing 'repo' to the PATH
+                                        def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
+                                        env.PATH = "${repoDir}:${env.PATH}"
+                                    }
+                                    withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
+                                        sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
                                         sh "repo sync"
                                     }
                                 }
-
                                 // Checkout the specified manifest group (uncomment if needed)
                                 // sh "repo forall -c 'git checkout ${repoToolStrategy['repo-manifest-branch']}' -g ${repoToolStrategy['repo-manifest-group']}"
                             } else {
