@@ -1,11 +1,11 @@
 token: MEV_CI_DOCS
 label: component-ci-nodes
-dockerImage: ubuntu:latest
+dockerImag: ubuntu:latest
 
 scmCheckoutStrategies:
   - strategy-name: repo-tool-with-gh-token
     repo-manifest-url: https://github.com/Brandonawan/repo-tool.git
-    repo-manifest-branchs: main
+    repo-manifest-branch: main
     github-token-jenkins-credential-id: Brandon-token
 
 # repo-manifest-url: https://github.com/axumt/project1-shared-library.git
