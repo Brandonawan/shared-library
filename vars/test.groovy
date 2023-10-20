@@ -12,14 +12,24 @@ def call() {
             timestamps()
         }
         stages {
-            stage('Clone Repository') { // Renamed from 'Checkout'
-            steps {
-                withCredentials([string(credentialsId: 'brandon-shared-library', variable: 'GITHUB_TOKEN')]) {
-                    sh "git clone https://Brandonawan:${GITHUB_TOKEN}@github.com/repo-tool.git"
+            stage('Clone GitHub Repository') {
+                steps {
+                    // Define the GitHub repository URL
+                    def gitRepoUrl = 'https://github.com/axumt/project1-shared-library.git'
+                    
+                    // Define the credentials ID for the Jenkins credential containing the GitHub token
+                    def credentialsId = 'brandon-shared-library' // Replace with your actual credential ID
+                    
+                    // Clone the GitHub repository using the GitHub token
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: '*/main']], // Specify the branch you want to clone
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [[$class: 'CloneOption', depth: 0, noTags: false, reference: '', shallow: true]],
+                        userRemoteConfigs: [[url: gitRepoUrl, credentialsId: credentialsId]]
+                    ])
                 }
             }
-        }
-
             stage('Check Files') {
                 steps {
                     script {
