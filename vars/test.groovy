@@ -6,6 +6,18 @@ def call() {
     def pipelineConfigPath = 'jenkins/pipeline-config.yml'
     def confluenceDocLink = 'https://your-confluence-link.com/documentation'
 
+    def expectedKeys = ['token', 'label', 'dockerImage', 'scmCheckoutStrategies']
+
+    def pipelineConfigContent = readFile(file: pipelineConfigPath)
+    def pipelineConfig = readYaml text: pipelineConfigContent
+
+    // Check if the top-level keys exist
+    for (key in expectedKeys) {
+        if (!pipelineConfig.containsKey(key)) {
+            error "Error: Missing key '$key' in the configuration file. Refer to the documentation for guidance: [${confluenceDocLink}]"
+        }
+    }
+
     pipeline {
         agent any
         options {

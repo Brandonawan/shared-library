@@ -5,7 +5,7 @@ dockerImage: ubuntu:latest
 scmCheckoutStrategies:
   - strategy-name: repo-tool-with-gh-token
     repo-manifest-url: https://github.com/Brandonawan/repo-tool.git
-    repo-manifest-branch: main
+    repo-manifest-branchs: main
     github-token-jenkins-credential-id: Brandon-token
 
 # repo-manifest-url: https://github.com/axumt/project1-shared-library.git

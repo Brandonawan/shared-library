@@ -2,7 +2,6 @@
 
 // Define a function to check files and run the pipeline
 def call() {
-    
     def jenkinBuildPath = 'jenkins/jenkins-build'
     def pipelineConfigPath = 'jenkins/pipeline-config.yml'
     def confluenceDocLink = 'https://your-confluence-link.com/documentation'
@@ -13,7 +12,7 @@ def call() {
 
     pipeline {
         agent {
-	    label label
+            label label
         }
         options {
             ansiColor('xterm')
@@ -21,7 +20,7 @@ def call() {
         }
         triggers {
             GenericTrigger(
-		        token: token,
+                token: token,
                 printContributedVariables: true,
                 printPostContent: false,
             )
@@ -58,17 +57,20 @@ def call() {
                                         def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
                                         env.PATH = "${repoDir}:${env.PATH}"
                                     }
-                                    sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
-                                    sh "repo sync"
+                                    withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
+                                        try {
+                                            sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
+                                            sh "repo sync"
+                                        } catch (e) {
+                                            error "Error during repo initialization and sync: ${e.message}"
+                                        }
+                                    }
                                 }
-
-                                // Checkout the specified manifest group (uncomment if needed)
-                                // sh "repo forall -c 'git checkout ${repoToolStrategy['repo-manifest-branch']}' -g ${repoToolStrategy['repo-manifest-group']}"
                             } else {
-                                echo "No supported checkout strategy found in the configuration. Skipping checkout."
+                                error "No supported checkout strategy found in the configuration. Skipping checkout."
                             }
                         } else {
-                            echo "No scmCheckoutStrategies defined in the configuration. Skipping checkout."
+                            error "No scmCheckoutStrategies defined in the configuration. Skipping checkout."
                         }
                     }
                 }
@@ -77,15 +79,9 @@ def call() {
                 steps {
                     script {
                         echo "Starting 'Check Files' stage"
-                        if (jenkinsBuildPath.isEmpty()) {
-                            error "Error: No build script is found. Please specify a valid file path. Refer to the documentation for guidance: [${confluenceDocLink}]"
-                        }
-
-                        checkFileExistsInternal(jenkinsBuildPath)
+                        checkFileExists(jenkinBuildPath)
                         checkFileExists(pipelineConfigPath)
-
-                        // Check if jenkins-build is executable
-                        checkIfJenkinsBuildIsExecutable(jenkinsBuildPath)
+                        checkIfJenkinsBuildIsExecutable(jenkinBuildPath)
                     }
                 }
             }
@@ -130,18 +126,13 @@ def call() {
     }
 }
 
-def checkFileExistsInternal(fileName) {
-    def fileExists = fileExists(fileName)
-    if (!fileExists) {
+def checkFileExists(fileName) {
+    if (!fileExists(fileName)) {
         error "File '${fileName}' not found in the repository."
     }
 }
 
-def checkFileExists(fileName) {
-    checkFileExistsInternal(fileName)
-}
-
-def checkIfJenkinBuildIsExecutable(fileName) {
+def checkIfJenkinsBuildIsExecutable(fileName) {
     if (!fileExists(fileName)) {
         error "The '${fileName}' file is not found in the repository."
     }

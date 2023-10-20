@@ -30,3 +30,8 @@ To use this Jenkins Pipeline Library in your project, follow these steps:
    @Library('my-pipeline-library')_
    projectOne()
     ```
+
+sudo mkdir -p /var/lib/jenkins/bin
+
+sudo chown -R jenkins:jenkins /var/lib/jenkins/bin
+
