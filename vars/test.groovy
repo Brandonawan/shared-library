@@ -29,9 +29,13 @@ def call() {
                 }
             }
 
-            stage('Validate YAML Configuration') {
+            stage('Checkout') {
                 steps {
                     script {
+                        echo "Starting 'Checkout' stage"
+                        def pipelineConfigContent = readFile(file: pipelineConfigPath)
+                        def pipelineConfig = readYaml text: pipelineConfigContent
+
                         echo "Starting 'Validate YAML Configuration' stage"
 
                         try {
@@ -39,36 +43,25 @@ def call() {
                             def pipelineConfig = readYaml text: pipelineConfigContent
 
                             if (!pipelineConfig.token) {
-                                error "Error: 'token' key is missing in the YAML configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
+                                error "Error: 'token' key is missing or misconfigured in the YAML configuration. Please verify the 'token' key in your configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
                             }
 
                             if (!pipelineConfig.label) {
-                                error "Error: 'label' key is missing in the YAML configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
+                                error "Error: 'label' key is missing or misconfigured in the YAML configuration. Please verify the 'label' key in your configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
                             }
 
                             if (!pipelineConfig.dockerImage) {
-                                error "Error: 'dockerImage' key is missing in the YAML configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
+                                error "Error: 'dockerImage' key is missing or misconfigured in the YAML configuration. Please verify the 'dockerImage' key in your configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
                             }
 
                             if (!pipelineConfig.scmCheckoutStrategies) {
-                                error "Error: 'scmCheckoutStrategies' key is missing in the YAML configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
+                                error "Error: 'scmCheckoutStrategies' key is missing or misconfigured in the YAML configuration. Please verify the 'scmCheckoutStrategies' key in your configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
                             }
 
                             echo "YAML configuration is valid."
                         } catch (e) {
                             error "Error: Failed to validate the YAML configuration. Please check the configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
                         }
-                    }
-                }
-            }
-
-
-            stage('Checkout') {
-                steps {
-                    script {
-                        echo "Starting 'Checkout' stage"
-                        def pipelineConfigContent = readFile(file: pipelineConfigPath)
-                        def pipelineConfig = readYaml text: pipelineConfigContent
 
                         if (pipelineConfig.scmCheckoutStrategies) {
                             def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
