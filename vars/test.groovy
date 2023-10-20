@@ -37,15 +37,6 @@ def call() {
                                 // Install Repo tool if not already installed
                                 sh "if [ ! -f \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > /var/lib/jenkins/bin/repo; chmod +x /var/lib/jenkins/bin/repo; echo 'Repo tool installation completed.'; fi"
 
-                                // Create a Git credential helper configuration file
-                                def gitCredentialHelperConfig = """
-                                machine github.com
-                                login ${repoToolStrategy['github-token-jenkins-credential-id']}
-                                password ${GITHUB_TOKEN}
-                                """
-
-                                writeFile(file: "${env.HOME}/.git-credentials", text: gitCredentialHelperConfig)
-
                                 // Fetch the manifest repository
                                 dir('repo') {
                                     script {
@@ -53,10 +44,15 @@ def call() {
                                         def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
                                         env.PATH = "${repoDir}:${env.PATH}"
                                     }
-                                    // Use the Git credential helper
-                                    sh "git config --global credential.helper 'store --file=${env.HOME}/.git-credentials'"
-                                    sh "repo init -u https://github.com/axumt/project1-shared-library.git -b ${repoToolStrategy['repo-manifest-branch']}"
-                                    sh "repo sync"
+                                    
+                                    // Retrieve GitHub token from Jenkins credentials
+                                    withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
+                                        // Use the token in the Git URL
+                                        sh "git config --global credential.username ${GITHUB_TOKEN}"
+                                        sh "git config --global credential.helper store"
+                                        sh "repo init -u https://github.com/axumt/project1-shared-library.git -b ${repoToolStrategy['repo-manifest-branch']}"
+                                        sh "repo sync"
+                                    }
                                 }
                                 // Checkout the specified manifest group (uncomment if needed)
                                 // sh "repo forall -c 'git checkout ${repoToolStrategy['repo-manifest-branch']}' -g ${repoToolStrategy['repo-manifest-group']}"

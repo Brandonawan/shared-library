@@ -6,8 +6,8 @@ scmCheckoutStrategies:
   - strategy-name: repo-tool-with-gh-token
     repo-manifest-url: https://github.com/axumt/project1-shared-library.git
     repo-manifest-branch: main
-    github-token-jenkins-credential-id: brandon-shared-library
-    
+    github-token-jenkins-credential-id: token-brandon
+
 # repo-manifest-url: https://github.com/axumt/project1-shared-library.git
     # repo-manifest-group: IDPF
 
