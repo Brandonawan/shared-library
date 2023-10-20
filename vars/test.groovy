@@ -36,33 +36,24 @@ def call() {
 
                                 // Install Repo tool if not already installed
                                 sh "if [ ! -f \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > /var/lib/jenkins/bin/repo; chmod +x /var/lib/jenkins/bin/repo; echo 'Repo tool installation completed.'; fi"
-                                // Set up the environment variable GITHUB_TOKEN using Jenkins credentials
-                                withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
-                                    // Fetch the manifest repository
-                                    dir('repo') {
-                                        script {
-                                            // Add the directory containing 'repo' to the PATH
-                                            def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
-                                            env.PATH = "${repoDir}:${env.PATH}"
-                                        }
-                                        // Use GITHUB_TOKEN in the repo init command
-                                        // sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']} --reference=$GITHUB_TOKEN"
-                                        // sh "repo sync"
-                                        sh """
-                                            repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']} \
-                                            --config-name github-token \
-                                            --repo-url https://github.com/ \
-                                            --no-repo-verify \
-                                            --repo-branch main \
-                                            --repo-clone-url https://oauth2:${GITHUB_TOKEN}@github.com/ \
-                                            """
 
-                                        // Initialize repo tool and fetch the manifest repository
-                                        sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
+                                // Fetch the manifest repository
+                                dir('repo') {
+                                    script {
+                                        // Add the directory containing 'repo' to the PATH
+                                        def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
+                                        env.PATH = "${repoDir}:${env.PATH}"
+                                    }
+                                    
+                                    // Retrieve GitHub token from Jenkins credentials
+                                    withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
+                                        // Use the token in the Git URL
+                                        sh "repo init -u https://${GITHUB_TOKEN}@github.com/axumt/project1-shared-library.git -b ${repoToolStrategy['repo-manifest-branch']}"
                                         sh "repo sync"
-
                                     }
                                 }
+                                // Checkout the specified manifest group (uncomment if needed)
+                                // sh "repo forall -c 'git checkout ${repoToolStrategy['repo-manifest-branch']}' -g ${repoToolStrategy['repo-manifest-group']}"
                             } else {
                                 echo "No supported checkout strategy found in the configuration. Skipping checkout."
                             }
@@ -72,7 +63,6 @@ def call() {
                     }
                 }
             }
-
 
             // stage('Checkout') {
             //     steps {
