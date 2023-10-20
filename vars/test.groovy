@@ -9,11 +9,11 @@ def call() {
     def expectedKeys = ['token', 'label', 'dockerImage', 'scmCheckoutStrategies']
 
     def pipelineConfigContent = readFile(file: pipelineConfigPath)
-    def pipelineConfig = readYaml text: pipelineConfigContent
+    def pipelineConfigs = readYaml text: pipelineConfigContent
 
     // Check if the top-level keys exist
     for (key in expectedKeys) {
-        if (!pipelineConfig.containsKey(key)) {
+        if (!pipelineConfigs.containsKey(key)) {
             error "Error: Missing key '$key' in the configuration file. Refer to the documentation for guidance: [${confluenceDocLink}]"
         }
     }
