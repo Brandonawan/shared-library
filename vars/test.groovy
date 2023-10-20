@@ -38,70 +38,78 @@ def call() {
 
                         echo "Starting 'Validate YAML Configuration' stage"
 
-                        try {
+                        def errors = []  // Create an array to collect errors
 
+                        try {
                             if (!pipelineConfig.token) {
-                                error "Error: 'token' key is missing or misconfigured in the YAML configuration. Please verify the 'token' key in your configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
+                                errors.add("Error: 'token' key is missing or misconfigured in the YAML configuration.")
                             }
 
                             if (!pipelineConfig.label) {
-                                error "Error: 'label' key is missing or misconfigured in the YAML configuration. Please verify the 'label' key in your configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
+                                errors.add("Error: 'label' key is missing or misconfigured in the YAML configuration.")
                             }
 
                             if (!pipelineConfig.dockerImage) {
-                                error "Error: 'dockerImage' key is missing or misconfigured in the YAML configuration. Please verify the 'dockerImage' key in your configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
+                                errors.add("Error: 'dockerImage' key is missing or misconfigured in the YAML configuration.")
                             }
 
                             if (!pipelineConfig.scmCheckoutStrategies) {
-                                error "Error: 'scmCheckoutStrategies' key is missing or misconfigured in the YAML configuration. Please verify the 'scmCheckoutStrategies' key in your configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
+                                errors.add("Error: 'scmCheckoutStrategies' key is missing or misconfigured in the YAML configuration.")
                             }
 
-                            echo "YAML configuration is valid."
-                        } catch (e) {
-                            error "Error: Failed to validate the YAML configuration. Please check the configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
-                        }
-
-                        if (pipelineConfig.scmCheckoutStrategies) {
-                            def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
-                            def customStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'custom-checkout' }
-                            def repoToolStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'repo-tool-with-gh-token' }
-
-                            if (defaultStrategy) {
-                                echo "Checking out Source Code using 'SCM default' strategy."
-                                checkout scm
-                            } else if (customStrategy) {
-                                echo "Checking out Source Code using 'SCM custom-checkout' strategy."
-                                sh "./${customStrategy['checkout-script-name']}"
-                            } else if (repoToolStrategy) {
-                                echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
-
-                                // Install Repo tool if not already installed
-                                sh "if [ ! -f \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > /var/lib/jenkins/bin/repo; chmod +x /var/lib/jenkins/bin/repo; echo 'Repo tool installation completed.'; fi"
-
-                                // Fetch the manifest repository
-                                dir('repo') {
-                                    script {
-                                        // Add the directory containing 'repo' to the PATH
-                                        def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
-                                        env.PATH = "${repoDir}:${env.PATH}"
-                                    }
-                                    withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
-                                        // sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
-                                        sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
-                                        sh "repo sync"
-                                    }
+                            if (errors) {
+                                // If there are errors, log each one
+                                for (error in errors) {
+                                    error(error)
                                 }
-                                // Checkout the specified manifest group (uncomment if needed)
-                                // sh "repo forall -c 'git checkout ${repoToolStrategy['repo-manifest-branch']}' -g ${repoToolStrategy['repo-manifest-group']}"
                             } else {
-                                echo "No supported checkout strategy found in the configuration. Skipping checkout."
+                                echo "YAML configuration is valid."
                             }
-                        } else {
-                            echo "No scmCheckoutStrategies defined in the configuration. Skipping checkout."
+
+                            if (pipelineConfig.scmCheckoutStrategies) {
+                                def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
+                                def customStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'custom-checkout' }
+                                def repoToolStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'repo-tool-with-gh-token' }
+
+                                if (defaultStrategy) {
+                                    echo "Checking out Source Code using 'SCM default' strategy."
+                                    checkout scm
+                                } else if (customStrategy) {
+                                    echo "Checking out Source Code using 'SCM custom-checkout' strategy."
+                                    sh "./${customStrategy['checkout-script-name']}"
+                                } else if (repoToolStrategy) {
+                                    echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
+
+                                    // Install Repo tool if not already installed
+                                    sh "if [ ! -f \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > /var/lib/jenkins/bin/repo; chmod +x /var/lib/jenkins/bin/repo; echo 'Repo tool installation completed.'; fi"
+
+                                    // Fetch the manifest repository
+                                    dir('repo') {
+                                        script {
+                                            // Add the directory containing 'repo' to the PATH
+                                            def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
+                                            env.PATH = "${repoDir}:${env.PATH}"
+                                        }
+                                        withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
+                                            sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
+                                            sh "repo sync"
+                                        }
+                                    }
+                                    // Checkout the specified manifest group (uncomment if needed)
+                                    // sh "repo forall -c 'git checkout ${repoToolStrategy['repo-manifest-branch']}' -g ${repoToolStrategy['repo-manifest-group']}"
+                                } else {
+                                    echo "No supported checkout strategy found in the configuration. Skipping checkout."
+                                }
+                            } else {
+                                echo "No scmCheckoutStrategies defined in the configuration. Skipping checkout."
+                            }
+                        } catch (e) {
+                            error "Error: Failed to validate the YAML configuration or checkout source code. Please check the configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
                         }
                     }
                 }
             }
+
 
             stage('Read Docker Image Name') {
                 steps {
