@@ -4,10 +4,9 @@ dockerImage: ubuntu:latest
 
 scmCheckoutStrategies:
   - strategy-name: repo-tool-with-gh-token
-    repo-manifest-url: https://github.com/axumt/project1-shared-library.git
     repo-manifest-branch: main
     github-token-jenkins-credential-id: brandon-shared-library
-
+# repo-manifest-url: https://github.com/axumt/project1-shared-library.git
     # repo-manifest-group: IDPF
 
     # - strategy-name: default

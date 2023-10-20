@@ -59,7 +59,8 @@ def call() {
                                         env.PATH = "${repoDir}:${env.PATH}"
                                     }
                                     withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
-                                        sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
+                                        // sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
+                                        sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']} -t \$GITHUB_TOKEN"
                                         sh "repo sync"
                                     }
                                 }
