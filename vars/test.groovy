@@ -1,22 +1,9 @@
 #!/usr/bin/env groovy
 
 def call() {
-
     def jenkinsBuildPath = 'jenkins/jenkin-build'
     def pipelineConfigPath = 'jenkins/pipeline-config.yml'
     def confluenceDocLink = 'https://your-confluence-link.com/documentation'
-
-    def expectedKeys = ['token', 'label', 'dockerImage', 'scmCheckoutStrategies']
-
-    def pipelineConfigContent = readFile(file: pipelineConfigPath)
-    def pipelineConfigs = readYaml text: pipelineConfigContent
-
-    // Check if the top-level keys exist
-    for (key in expectedKeys) {
-        if (!pipelineConfigs.containsKey(key)) {
-            error "Error: Missing key '$key' in the configuration file. Refer to the documentation for guidance: [${confluenceDocLink}]"
-        }
-    }
 
     pipeline {
         agent any
@@ -25,6 +12,57 @@ def call() {
             timestamps()
         }
         stages {
+            stage('Check Files') {
+                steps {
+                    script {
+                        echo "Starting 'Check Files' stage"
+                        if (jenkinsBuildPath.isEmpty()) {
+                            error "Error: No build script is found. Please specify a valid file path. Refer to the documentation for guidance: [${confluenceDocLink}]"
+                        }
+
+                        checkFileExistsInternal(jenkinsBuildPath)
+                        checkFileExists(pipelineConfigPath)
+
+                        // Check if jenkins-build is executable
+                        checkIfJenkinsBuildIsExecutable(jenkinsBuildPath)
+                    }
+                }
+            }
+
+            stage('Validate YAML Configuration') {
+                steps {
+                    script {
+                        echo "Starting 'Validate YAML Configuration' stage"
+
+                        try {
+                            def pipelineConfigContent = readFile(file: pipelineConfigPath)
+                            def pipelineConfig = readYaml text: pipelineConfigContent
+
+                            if (!pipelineConfig.token) {
+                                error "Error: 'token' key is missing in the YAML configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
+                            }
+
+                            if (!pipelineConfig.label) {
+                                error "Error: 'label' key is missing in the YAML configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
+                            }
+
+                            if (!pipelineConfig.dockerImage) {
+                                error "Error: 'dockerImage' key is missing in the YAML configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
+                            }
+
+                            if (!pipelineConfig.scmCheckoutStrategies) {
+                                error "Error: 'scmCheckoutStrategies' key is missing in the YAML configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
+                            }
+
+                            echo "YAML configuration is valid."
+                        } catch (e) {
+                            error "Error: Failed to validate the YAML configuration. Please check the configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
+                        }
+                    }
+                }
+            }
+
+
             stage('Checkout') {
                 steps {
                     script {
@@ -48,7 +86,6 @@ def call() {
 
                                 // Install Repo tool if not already installed
                                 sh "if [ ! -f \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > /var/lib/jenkins/bin/repo; chmod +x /var/lib/jenkins/bin/repo; echo 'Repo tool installation completed.'; fi"
-                            
 
                                 // Fetch the manifest repository
                                 dir('repo') {
@@ -71,23 +108,6 @@ def call() {
                         } else {
                             echo "No scmCheckoutStrategies defined in the configuration. Skipping checkout."
                         }
-                    }
-                }
-            }
-  
-            stage('Check Files') {
-                steps {
-                    script {
-                        echo "Starting 'Check Files' stage"
-                        if (jenkinsBuildPath.isEmpty()) {
-                            error "Error: No build script is found. Please specify a valid file path. Refer to the documentation for guidance: [${confluenceDocLink}]"
-                        }
-
-                        checkFileExistsInternal(jenkinsBuildPath)
-                        checkFileExists(pipelineConfigPath)
-
-                        // Check if jenkins-build is executable
-                        checkIfJenkinsBuildIsExecutable(jenkinsBuildPath)
                     }
                 }
             }
