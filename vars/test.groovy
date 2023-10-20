@@ -48,7 +48,9 @@ def call() {
                                     // Retrieve GitHub token from Jenkins credentials
                                     withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
                                         // Use the token in the Git URL
-                                        sh "repo init -u https://${GITHUB_TOKEN}@github.com/axumt/project1-shared-library.git -b ${repoToolStrategy['repo-manifest-branch']}"
+                                        sh "git config --global credential.username ${GITHUB_TOKEN}"
+                                        sh "git config --global credential.helper store"
+                                        sh "repo init -u https://github.com/axumt/project1-shared-library.git -b ${repoToolStrategy['repo-manifest-branch']}"
                                         sh "repo sync"
                                     }
                                 }
