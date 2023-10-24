@@ -12,14 +12,6 @@ def call() {
             timestamps()
         }
         stages {
-            // stage('Clone Repository') {
-            //     steps {
-            //         deleteDir() // Ensure the workspace is clean
-            //         withCredentials([string(credentialsId: 'token-brandon', variable: 'GIT_CREDENTIAL')]) {
-            //             sh "git clone git@github.com:axumt/project1-shared-library.git"
-            //         }
-            //     }
-            // }
             stage('Check Files') {
                 steps {
                     script {
@@ -117,23 +109,6 @@ def call() {
                     }
                 }
             }
-
-            stage('Check Files') {
-                steps {
-                    script {
-                        echo "Starting 'Check Files' stage"
-                        if (jenkinsBuildPath.isEmpty()) {
-                            error "Error: No build script is found. Please specify a valid file path. Refer to the documentation for guidance: [${confluenceDocLink}]"
-                        }
-
-                        checkFileExistsInternal(jenkinsBuildPath)
-                        checkFileExists(pipelineConfigPath)
-
-                        // Check if jenkins-build is executable
-                        checkIfJenkinsBuildIsExecutable(jenkinsBuildPath)
-                    }
-                }
-            }
             // stage('Checkout') {
             //     steps {
             //         script {
@@ -212,8 +187,6 @@ def call() {
             //         }
             //     }
             // }
-
-
             stage('Read Docker Image Name') {
                 steps {
                     script {
