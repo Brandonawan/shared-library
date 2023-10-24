@@ -12,14 +12,14 @@ def call() {
             timestamps()
         }
         stages {
-            stage('Clone Repository') {
-                steps {
-                    deleteDir() // Ensure the workspace is clean
-                    withCredentials([string(credentialsId: 'token-brandon', variable: 'GIT_CREDENTIAL')]) {
-                        sh "git clone git@github.com:axumt/project1-shared-library.git"
-                    }
-                }
-            }
+            // stage('Clone Repository') {
+            //     steps {
+            //         deleteDir() // Ensure the workspace is clean
+            //         withCredentials([string(credentialsId: 'token-brandon', variable: 'GIT_CREDENTIAL')]) {
+            //             sh "git clone git@github.com:axumt/project1-shared-library.git"
+            //         }
+            //     }
+            // }
             // stage('Check Files') {
             //     steps {
             //         script {
