@@ -30,5 +30,10 @@
              remote="spring-projects"
              revision="main"
     />
+
+    <default>
+        <project name="project-html-website" />
+        <project name="learning-app-ecommerce" />
+    </default>
 ​
 </manifest>
