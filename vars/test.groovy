@@ -20,22 +20,22 @@ def call() {
                     }
                 }
             }
-            stage('Check Files') {
-                steps {
-                    script {
-                        echo "Starting 'Check Files' stage"
-                        if (jenkinsBuildPath.isEmpty()) {
-                            error "Error: No build script is found. Please specify a valid file path. Refer to the documentation for guidance: [${confluenceDocLink}]"
-                        }
+            // stage('Check Files') {
+            //     steps {
+            //         script {
+            //             echo "Starting 'Check Files' stage"
+            //             if (jenkinsBuildPath.isEmpty()) {
+            //                 error "Error: No build script is found. Please specify a valid file path. Refer to the documentation for guidance: [${confluenceDocLink}]"
+            //             }
 
-                        checkFileExistsInternal(jenkinsBuildPath)
-                        checkFileExists(pipelineConfigPath)
+            //             checkFileExistsInternal(jenkinsBuildPath)
+            //             checkFileExists(pipelineConfigPath)
 
-                        // Check if jenkins-build is executable
-                        checkIfJenkinsBuildIsExecutable(jenkinsBuildPath)
-                    }
-                }
-            }
+            //             // Check if jenkins-build is executable
+            //             checkIfJenkinsBuildIsExecutable(jenkinsBuildPath)
+            //         }
+            //     }
+            // }
 
             stage('Checkout') {
                 steps {
@@ -118,6 +118,22 @@ def call() {
                 }
             }
 
+            stage('Check Files') {
+                steps {
+                    script {
+                        echo "Starting 'Check Files' stage"
+                        if (jenkinsBuildPath.isEmpty()) {
+                            error "Error: No build script is found. Please specify a valid file path. Refer to the documentation for guidance: [${confluenceDocLink}]"
+                        }
+
+                        checkFileExistsInternal(jenkinsBuildPath)
+                        checkFileExists(pipelineConfigPath)
+
+                        // Check if jenkins-build is executable
+                        checkIfJenkinsBuildIsExecutable(jenkinsBuildPath)
+                    }
+                }
+            }
             // stage('Checkout') {
             //     steps {
             //         script {
