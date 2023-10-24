@@ -96,7 +96,7 @@ def call() {
                                         }
                                     }
                                     // Checkout the specified manifest group (uncomment if needed)
-                                    sh "repo forall -c 'git checkout ${repoToolStrategy['repo-manifest-branch']}' -g ${repoToolStrategy['repo-manifest-group']}"
+                                    // sh "repo forall -c 'git checkout ${repoToolStrategy['repo-manifest-branch']}' -g ${repoToolStrategy['repo-manifest-group']}"
                                 } else {
                                     echo "No supported checkout strategy found in the configuration. Skipping checkout."
                                 }
