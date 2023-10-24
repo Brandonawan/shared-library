@@ -2,7 +2,7 @@ token: MEV_CI_DOCS
 label: component-ci-nodes
 dockerImage: ubuntu:latest
 
-scmCheckoutStrategies:
+scmCheckoutStrategies: 
   - strategy-name: repo-tool-with-gh-token
     repo-manifest-url: https://github.com/axumt/project1-shared-library.git
     repo-manifest-branch: main
