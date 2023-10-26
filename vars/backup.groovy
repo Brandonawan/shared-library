@@ -187,3 +187,20 @@ def checkIfJenkinsBuildIsExecutable(fileName) {
         error "Error: The '${fileName}' file is not executable. Refer to the documentation for guidance: [${confluenceDocLink}]"
     }
 }
+
+
+            // stage('Clean Jenkins Workspace') {
+            //     steps {
+            //         sh 'pwd'
+            //         sh 'ls -la'
+            //         sh 'cat .jenkins/pipeline-config.yml'
+            //         sh 'cat .jenkins/jenkins-build'
+            //         sh 'cat Jenkinsfile'
+            //         echo "Starting 'Clean Workspace' stage"
+            //         cleanWs()
+            //         echo "${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully"
+            //         echo "View Documentation: ${confluenceDocLink}"
+            //         sh 'pwd'
+            //         sh 'ls -la'
+            //     }
+            // }
