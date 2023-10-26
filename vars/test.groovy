@@ -38,6 +38,7 @@ def call() {
                                 def pipelineConfigContent = readFile(file: yamlConfigPath)
                                 def pipelineConfig = readYaml text: pipelineConfigContent
                             
+                                
                                 // Check the YAML configuration for the checkout strategy
                                 if (pipelineConfig.scmCheckoutStrategies) {
                                     def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
