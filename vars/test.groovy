@@ -1,6 +1,8 @@
 #!/usr/bin/env groovy
+
 def call() {
     def confluenceDocLink = 'https://your-confluence-link.com/documentation'
+
     pipeline {
         agent any
         options {
@@ -18,34 +20,32 @@ def call() {
             stage('Checkout') {
                 steps {
                     script {
-                        // sh 'cat .jenkins/pipeline-config.yml'
                         echo "Starting 'Checkout' stage"
-                        
                         sh 'pwd'
                         sh 'ls -la'
-                        dir ('.jenkins') {
+                        dir('.jenkins') {
                             sh 'pwd'
                             sh 'ls -la'
-                                // Define the path to the YAML configuration file
+
+                            // Define the path to the YAML configuration file
                             def yamlConfigPath = 'pipeline-config.yml'
-                            // sh "cat ${yamlConfigPath}"
-                            
+
                             // Check if the YAML configuration file exists
                             def yamlConfigExists = fileExists(yamlConfigPath)
-                            
+
                             if (yamlConfigExists) {
                                 // Read the YAML configuration
                                 def pipelineConfigContent = readFile(file: yamlConfigPath)
                                 def pipelineConfig = readYaml text: pipelineConfigContent
-                            
 
                                 // Check the YAML configuration for the checkout strategy
                                 if (pipelineConfig.scmCheckoutStrategies) {
                                     def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
                                     def customStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'custom-checkout' }
                                     def repoToolStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'repo-tool-with-gh-token' }
-                                    
-                                    sh 'echo ${customStrategy}}'
+
+                                    echo "${customStrategy}"
+
                                     if (defaultStrategy) {
                                         echo "Checking out Source Code using 'SCM default' strategy."
                                         checkout scm
@@ -88,7 +88,6 @@ def call() {
                                                 }
                                             }
                                         }
-                                    }
                                     } else {
                                         echo "No supported checkout strategy found in the configuration. Skipping checkout."
                                     }
@@ -98,7 +97,6 @@ def call() {
                             } else {
                                 error "YAML configuration file not found: $yamlConfigPath"
                             }
-                
                         }
                     }
                 }
@@ -106,6 +104,7 @@ def call() {
         }
     }
 }
+
 
 
 // def call() {
