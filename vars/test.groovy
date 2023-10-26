@@ -1,6 +1,11 @@
 #!/usr/bin/env groovy
 def call() {
     node {
+        stage('Checkout') {
+            // Perform the checkout here, e.g., using Git
+            checkout scm
+        }
+        
         // Your file-related operations here
         def jenkinsBuildPath = '.jenkins/jenkin-build'
         def pipelineConfigPath = '.jenkins/pipeline-config.yml'
@@ -22,6 +27,7 @@ def call() {
         }
     }
 }
+
 
 
 // def call() {
