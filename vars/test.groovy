@@ -24,6 +24,7 @@ def call() {
                 steps {
                     script {
                         echo "Starting 'Check Files' stage"
+                        pwd()
                         if (jenkinsBuildPath.isEmpty()) {
                             error "Error: No build script is found. Please specify a valid file path. Refer to the documentation for guidance: [${confluenceDocLink}]"
                         }
