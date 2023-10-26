@@ -12,14 +12,6 @@ def call() {
             timestamps()
         }
         stages {
-            stage('Clean Workspace') {
-                steps {
-                    echo "Starting 'Clean Workspace' stage"
-                    cleanWs()
-                    echo "${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully"
-                    echo "View Documentation: ${confluenceDocLink}"
-                }
-            }
             stage('Check Files') {
                 steps {
                     script {
@@ -88,11 +80,8 @@ def call() {
                                 } else if (repoToolStrategy) {
                                     echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
 
-                                    // Check if 'repo' tool is installed
-                                    def repoToolInstalled = sh(script: "which repo", returnStatus: true)
-                                    if (repoToolInstalled != 0) {
-                                        error "Error: The 'repo' tool is not installed. Please install 'repo' tool or choose a different checkout strategy. Refer to the documentation for guidance: [${confluenceDocLink}]"
-                                    }
+                                    // Install Repo tool if not already installed
+                                    sh "if [ ! -f \"\$(which repo)\" ]; then curl https://storage.googleapis.com/git-repo-downloads/repo > /var/lib/jenkins/bin/repo; chmod +x /var/lib/jenkins/bin/repo; echo 'Repo tool installation completed.'; fi"
 
                                     // Fetch the manifest repository
                                     dir('repo') {
@@ -102,7 +91,7 @@ def call() {
                                             env.PATH = "${repoDir}:${env.PATH}"
                                         }
                                         withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
-                                            sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']} -g ${repoToolStrategy['repo-manifest-group']}"
+                                            sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
                                             sh "repo sync"
                                         }
                                     }

@@ -1,31 +1,19 @@
 token: MEV_CI_DOCS
 label: component-ci-nodes
-dockerImage: ubuntu:latest
+dockerImage: dockerImage: artifacts-bxdsw.sc.intel.com:9444/mev/fedora:30
 
 scmCheckoutStrategies: 
+  - strategy-name: default
   # - strategy-name: repo-tool-with-gh-token
   #   repo-manifest-url: https://github.com/Brandonawan/shared-library.git
   #   repo-manifest-branch: main
   #   github-token-jenkins-credential-id: Brandon-token
   #   repo-manifest-group: IDPF
-    # - strategy-name: custom-checkout
-    #   checkout-script-name: jenkins/custom-checkout.sh
-  # - strategy-name: default
-
-
-# repo-manifest-url: https://github.com/axumt/project1-shared-library.git
-    # repo-manifest-group: IDPF
-
-    # - strategy-name: default
-
-    # - strategy-name: custom-checkout
-    #   checkout-script-name: jenkins/custom-checkout.sh
-
-
-
-
+    
+  # - strategy-name: custom-checkout
+  #   checkout-script-name: jenkins/custom-checkout.sh
+  
 # dockerImage: artifacts-bxdsw.sc.intel.com:9444/mev/fedora:30
-
 
 # jenkinsFileEath: ienkinsilenkinsfile-post-merge
 
