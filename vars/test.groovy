@@ -6,20 +6,9 @@ def call() {
             checkout scm
         }
         
-        // Your file-related operations here
-        def jenkinsBuildPath = '.jenkins/jenkin-build'
         def pipelineConfigPath = '.jenkins/pipeline-config.yml'
 
-        def jenkinsBuildExists = fileExists(jenkinsBuildPath)
         def pipelineConfigExists = fileExists(pipelineConfigPath)
-
-        // Log the results
-        if (jenkinsBuildExists) {
-            echo "jenkin-build file found: $jenkinsBuildPath"
-        } else {
-            error "jenkin-build file not found: $jenkinsBuildPath"
-        }
-
         if (pipelineConfigExists) {
             echo "pipeline-config.yml file found: $pipelineConfigPath"
         } else {
