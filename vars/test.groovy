@@ -68,44 +68,6 @@ def call() {
                             }
                 
                         }
-                    //     // Define the path to the YAML configuration file
-                    //     def yamlConfigPath = '.jenkins/pipeline-config.yml'
-                    //     sh "cat ${yamlConfigPath}"
-                        
-                    //     // Check if the YAML configuration file exists
-                    //     def yamlConfigExists = fileExists(yamlConfigPath)
-                        
-                    //     if (yamlConfigExists) {
-                    //         // Read the YAML configuration
-                    //         def pipelineConfigContent = readFile(file: yamlConfigPath)
-                    //         def pipelineConfig = readYaml text: pipelineConfigContent
-                        
-                    //         // Check the YAML configuration for the checkout strategy
-                    //         if (pipelineConfig.scmCheckoutStrategies) {
-                    //             def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
-                    //             def customStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'custom-checkout' }
-                    //             def repoToolStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'repo-tool-with-gh-token' }
-                                
-                    //             if (defaultStrategy) {
-                    //                 echo "Checking out Source Code using 'SCM default' strategy."
-                    //                 checkout scm
-                    //             } else if (customStrategy) {
-                    //                 echo "Checking out Source Code using 'SCM custom-checkout' strategy."
-                    //                 sh "./${customStrategy['checkout-script-name']}"
-                    //             } else if (repoToolStrategy) {
-                    //                 echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
-                                    
-                    //                 // Implement repo-tool checkout logic here
-                    //                 // ...
-                    //             } else {
-                    //                 echo "No supported checkout strategy found in the configuration. Skipping checkout."
-                    //             }
-                    //         } else {
-                    //             echo "No scmCheckoutStrategies defined in the configuration. Skipping checkout."
-                    //         }
-                    //     } else {
-                    //         error "YAML configuration file not found: $yamlConfigPath"
-                    //     }
                     }
                 }
             }
