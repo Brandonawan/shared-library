@@ -20,7 +20,7 @@ def call() {
             stage('Checkout') {
                 steps {
                     script {
-                        echo "Checking for files in the workspace"
+                        echo "Chec 'Checkout' stage"
                         sh 'pwd'
                         sh 'ls -la'
                         dir('.jenkins') {
@@ -46,7 +46,6 @@ def call() {
 
                                 try {
                                     if (!pipelineConfig.token) {
-                                        
                                         errors.add("Error: 'token' key is missing or misconfigured in the YAML configuration.")
                                     }
 
