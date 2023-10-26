@@ -1,3 +1,4 @@
+#!/usr/bin/env groovy
 def call() {
     // Define the paths to the required files
     def jenkinsBuildPath = '.jenkins/jenkin-build'
