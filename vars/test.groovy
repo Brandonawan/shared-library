@@ -54,10 +54,6 @@ def call() {
                                         sh "./${customStrategy['checkout-script-name']}"
                                     } else if (repoToolStrategy) {
                                         echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
-                                         // Check if 'repo' tool is installed
-                                    def repoToolInstalled = sh(script: "which repo", returnStatus: true)
-                                    if (repoToolStrategy) {
-                                        echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
 
                                         // Define the directory where you want to install 'repo' within .jenkins
                                         def repoDirectory = "${WORKSPACE}/.jenkins/repo"
