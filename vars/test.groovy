@@ -1,21 +1,45 @@
 #!/usr/bin/env groovy
 def call() {
-    node {
-        stage('Checkout') {
-            // Perform the checkout here, e.g., using Git
-            checkout scm
+    def confluenceDocLink = 'https://your-confluence-link.com/documentation'
+    pipeline {
+        agent any
+        options {
+            ansiColor('xterm')
+            timestamps()
         }
-        
-        def pipelineConfigPath = '.jenkins/pipeline-config.yml'
+        stages {
+            stage('Clean Workspace') {
+                steps {
+                    echo "Starting 'Clean Workspace' stage"
+                    cleanWs()
+                    echo "${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully"
+                    echo "View Documentation: ${confluenceDocLink}"
+                }
+            }
+            stage('Checkout') {
+                steps {
+                    // Perform the checkout here, e.g., using Git
+                    checkout scm
+                }
+            }
+            stage('Check Files') {
+                steps {
+                    script {
+                        def pipelineConfigPath = '.jenkins/pipeline-config.yml'
 
-        def pipelineConfigExists = fileExists(pipelineConfigPath)
-        if (pipelineConfigExists) {
-            echo "pipeline-config.yml file found: $pipelineConfigPath"
-        } else {
-            error "pipeline-config.yml file not found: $pipelineConfigPath"
+                        def pipelineConfigExists = fileExists(pipelineConfigPath)
+                        if (pipelineConfigExists) {
+                            echo "pipeline-config.yml file found: $pipelineConfigPath"
+                        } else {
+                            error "pipeline-config.yml file not found: $pipelineConfigPath"
+                        }
+                    }
+                }
+            }
         }
     }
 }
+
 
 
 
