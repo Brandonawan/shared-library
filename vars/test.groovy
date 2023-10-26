@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
-
-def call(){
+def call() {
+    def confluenceDocLink = 'https://your-confluence-link.com/documentation'
     pipeline {
         agent any
         options {
