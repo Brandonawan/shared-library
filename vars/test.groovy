@@ -56,17 +56,43 @@ def call() {
                                         echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
                                          // Check if 'repo' tool is installed
                                     def repoToolInstalled = sh(script: "which repo", returnStatus: true)
-                                    if (repoToolInstalled != 0) {
-                                        error "Error: The 'repo' tool is not installed. Please install 'repo' tool or choose a different checkout strategy. Refer to the documentation for guidance: [${confluenceDocLink}]"
-                                    }
-                                    // Fetch the manifest repository
-                                    withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
-                                            sh """
-                                            export PATH=~/bin:\$PATH  # Add the path to 'repo' in PATH
-                                            repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}
-                                            repo sync
-                                            """
+                                    if (repoToolStrategy) {
+                                        echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
+
+                                        // Define the directory where you want to install 'repo' within .jenkins
+                                        def repoDirectory = "${WORKSPACE}/.jenkins/repo"
+
+                                        // Check if 'repo' tool is installed
+                                        def repoToolInstalled = sh(script: 'command -v repo', returnStatus: true)
+
+                                        if (repoToolInstalled != 0) {
+                                            // 'repo' is not installed, so we need to install it
+                                            dir('.jenkins') {
+                                                script {
+                                                    // Create the directory if it doesn't exist
+                                                    if (!fileExists(repoDirectory)) {
+                                                        sh "mkdir -p $repoDirectory"
+                                                    }
+
+                                                    // Download and install 'repo' in the specified directory
+                                                    sh "curl https://storage.googleapis.com/git-repo-downloads/repo > $repoDirectory/repo"
+                                                    sh "chmod a+x $repoDirectory/repo"
+                                                }
+                                            }
+
+                                            // Add the directory containing 'repo' to the PATH
+                                            env.PATH = "${repoDirectory}:${env.PATH}"
                                         }
+
+                                        withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
+                                            dir('.jenkins/repo') {
+                                                script {
+                                                    sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
+                                                    sh "repo sync"
+                                                }
+                                            }
+                                        }
+                                    }
                                     } else {
                                         echo "No supported checkout strategy found in the configuration. Skipping checkout."
                                     }
