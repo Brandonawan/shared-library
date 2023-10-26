@@ -20,7 +20,7 @@ def call() {
             stage('Checkout') {
                 steps {
                     script {
-                        echo "Starting 'Checkout' stage"
+                        echo "Checking for files in the workspace"
                         sh 'pwd'
                         sh 'ls -la'
                         dir('.jenkins') {
@@ -34,10 +34,47 @@ def call() {
                             def yamlConfigExists = fileExists(yamlConfigPath)
 
                             if (yamlConfigExists) {
+
+                                echo "YAML configuration file found: $yamlConfigPath"
+
+                                echo "Starting 'Validate YAML Configuration' stage"
                                 // Read the YAML configuration
                                 def pipelineConfigContent = readFile(file: yamlConfigPath)
                                 def pipelineConfig = readYaml text: pipelineConfigContent
 
+                                def errors = []  // Create an array to collect errors
+
+                                try {
+                                    if (!pipelineConfig.token) {
+                                        errors.add("Error: 'token' key is missing or misconfigured in the YAML configuration.")
+                                    }
+
+                                    if (!pipelineConfig.label) {
+                                        errors.add("Error: 'label' key is missing or misconfigured in the YAML configuration.")
+                                    }
+
+                                    if (!pipelineConfig.dockerImage) {
+                                        errors.add("Error: 'dockerImage' key is missing or misconfigured in the YAML configuration.")
+                                    }
+
+                                    if (!pipelineConfig.scmCheckoutStrategies) {
+                                        errors.add("Error: 'scmCheckoutStrategies' key is missing or misconfigured in the YAML configuration.")
+                                    }
+
+                                    if (errors) {
+                                        // If there are errors, log each one
+                                        for (error in errors) {
+                                            error(error)
+                                        }
+                                    } else {
+                                        echo "YAML configuration is valid."
+                                    }
+                                } catch (e) {
+
+                                    error "Error: Failed to validate the YAML configuration. Please check the configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
+                                }
+
+                                echo "Starting 'Checkout Source Code' stage"
                                 // Check the YAML configuration for the checkout strategy
                                 if (pipelineConfig.scmCheckoutStrategies) {
                                     def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
