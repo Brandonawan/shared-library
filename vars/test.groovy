@@ -2,9 +2,7 @@
 def call() {
     def confluenceDocLink = 'https://your-confluence-link.com/documentation'
     pipeline {
-        agent {
-            label none
-        }
+        agent any
         options {
             ansiColor('xterm')
             timestamps()
