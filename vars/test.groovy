@@ -46,7 +46,7 @@ def call() {
 
                                 try {
                                     if (!pipelineConfig.token) {
-
+                                        
                                         errors.add("Error: 'token' key is missing or misconfigured in the YAML configuration.")
                                     }
 
