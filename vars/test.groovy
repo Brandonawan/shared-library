@@ -2,6 +2,7 @@
 
 def call() {
     def confluenceDocLink = 'https://your-confluence-link.com/documentation'
+    def pipelineConfig // Define pipelineConfig variable in a higher scope
 
     pipeline {
         agent any
