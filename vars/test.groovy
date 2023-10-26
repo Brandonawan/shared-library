@@ -44,92 +44,29 @@ def call() {
 
                                 def errors = []  // Create an array to collect errors
 
-                                try {
-                                    if (!pipelineConfig.token || pipelineConfig.token.isEmpty()) {
-                                        errors.add("Error: 'token' key is missing or empty in the YAML configuration.")
-                                    }
-
-                                    if (!pipelineConfig.label) {
-                                        errors.add("Error: 'label' key is missing or misconfigured in the YAML configuration.")
-                                    }
-
-                                    if (!pipelineConfig.dockerImage) {
-                                        errors.add("Error: 'dockerImage' key is missing or misconfigured in the YAML configuration.")
-                                    }
-
-                                    if (!pipelineConfig.scmCheckoutStrategies) {
-                                        errors.add("Error: 'scmCheckoutStrategies' key is missing or misconfigured in the YAML configuration.")
-                                    }
-
-                                    if (errors) {
-                                        // If there are errors, log each one
-                                        for (error in errors) {
-                                            error(error)
-                                        }
-                                    } else {
-                                        echo "YAML configuration is valid."
-                                    }
-                                } catch (e) {
-
-                                    error "Error: Failed to validate the YAML configuration. Please check the configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
+                                if (!pipelineConfig.token || pipelineConfig.token.isEmpty()) {
+                                    errors.add("Error: 'token' key is missing or empty in the YAML configuration.")
                                 }
 
-                                echo "Starting 'Checkout Source Code' stage"
-                                // Check the YAML configuration for the checkout strategy
-                                if (pipelineConfig.scmCheckoutStrategies) {
-                                    def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
-                                    def customStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'custom-checkout' }
-                                    def repoToolStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'repo-tool-with-gh-token' }
+                                if (!pipelineConfig.label || pipelineConfig.label.isEmpty()) {
+                                    errors.add("Error: 'label' key is missing or empty in the YAML configuration.")
+                                }
 
-                                    echo "${customStrategy}"
+                                if (!pipelineConfig.dockerImage || pipelineConfig.dockerImage.isEmpty()) {
+                                    errors.add("Error: 'dockerImage' key is missing or empty in the YAML configuration.")
+                                }
 
-                                    if (defaultStrategy) {
-                                        echo "Checking out Source Code using 'SCM default' strategy."
-                                        checkout scm
-                                    } else if (customStrategy) {
-                                        echo "Checking out Source Code using 'SCM custom-checkout' strategy."
-                                        sh "./${customStrategy['checkout-script-name']}"
-                                    } else if (repoToolStrategy) {
-                                        echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
+                                if (!pipelineConfig.scmCheckoutStrategies || pipelineConfig.scmCheckoutStrategies.isEmpty()) {
+                                    errors.add("Error: 'scmCheckoutStrategies' key is missing or empty in the YAML configuration.")
+                                }
 
-                                        // Define the directory where you want to install 'repo' within .jenkins
-                                        def repoDirectory = "${WORKSPACE}/.jenkins/repo"
-
-                                        // Check if 'repo' tool is installed
-                                        def repoToolInstalled = sh(script: 'command -v repo', returnStatus: true)
-
-                                        if (repoToolInstalled != 0) {
-                                            // 'repo' is not installed, so we need to install it
-                                            dir('.jenkins') {
-                                                script {
-                                                    // Create the directory if it doesn't exist
-                                                    if (!fileExists(repoDirectory)) {
-                                                        sh "mkdir -p $repoDirectory"
-                                                    }
-
-                                                    // Download and install 'repo' in the specified directory
-                                                    sh "curl https://storage.googleapis.com/git-repo-downloads/repo > $repoDirectory/repo"
-                                                    sh "chmod a+x $repoDirectory/repo"
-                                                }
-                                            }
-
-                                            // Add the directory containing 'repo' to the PATH
-                                            env.PATH = "${repoDirectory}:${env.PATH}"
-                                        }
-
-                                        withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
-                                            dir('.jenkins/repo') {
-                                                script {
-                                                    sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
-                                                    sh "repo sync"
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        echo "No supported checkout strategy found in the configuration. Skipping checkout."
+                                if (errors) {
+                                    // If there are errors, log each one
+                                    for (error in errors) {
+                                        error(error)
                                     }
                                 } else {
-                                    echo "No scmCheckoutStrategies defined in the configuration. Skipping checkout."
+                                    echo "YAML configuration is valid."
                                 }
                             } else {
                                 error "YAML configuration file not found: $yamlConfigPath"
