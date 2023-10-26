@@ -22,6 +22,7 @@ def call() {
                         echo "Starting 'Checkout' stage"
                         
                         sh 'pwd'
+                        sh 'ls'
                         // Define the path to the YAML configuration file
                         def yamlConfigPath = '.jenkins/pipeline-config.yml'
                         sh "${yamlConfigPath}"
