@@ -23,6 +23,8 @@ def call() {
                     cleanWs()
                     echo "${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully"
                     echo "View Documentation: ${confluenceDocLink}"
+                    sh 'pwd'
+                    sh 'ls -la'
                 }
             }
             stage('Checkout') {
