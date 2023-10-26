@@ -1,51 +1,122 @@
 #!/usr/bin/env groovy
-def call() {
-    def confluenceDocLink = 'https://your-confluence-link.com/documentation'
-    pipeline {
-        agent any
-        options {
-            ansiColor('xterm')
-            timestamps()
-        }
-        triggers {
-            GenericTrigger(
-                token: "my-dummy-token",
-                printContributedVariables: true,
-                printPostContent: false,
-            )
-        }
-        stages {
-            stage('Clean Workspace') {
-                steps {
-                    echo "Starting 'Clean Workspace' stage"
-                    cleanWs()
-                    echo "${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully"
-                    echo "View Documentation: ${confluenceDocLink}"
-                }
+pipeline {
+    agent any
+    options {
+        ansiColor('xterm')
+        timestamps()
+    }
+    triggers {
+        GenericTrigger(
+            token: "my-dummy-token",
+            printContributedVariables: true,
+            printPostContent: false,
+        )
+    }
+    stages {
+        stage('Clean Workspace') {
+            steps {
+                echo "Starting 'Clean Workspace' stage"
+                cleanWs()
+                echo "${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully"
+                echo "View Documentation: ${confluenceDocLink}"
             }
-            stage('Checkout') {
-                steps {
-                    // Perform the checkout here, e.g., using Git
-                    checkout scm
-                }
-            }
-            stage('Check Files') {
-                steps {
-                    script {
-                        def pipelineConfigPath = '.jenkins/pipeline-config.yml'
-
-                        def pipelineConfigExists = fileExists(pipelineConfigPath)
-                        if (pipelineConfigExists) {
-                            echo "pipeline-config.yml file found: $pipelineConfigPath"
+        }
+        stage('Checkout') {
+            steps {
+                script {
+                    echo "Starting 'Checkout' stage"
+                    
+                    // Define the path to the YAML configuration file
+                    def yamlConfigPath = '.jenkins/pipeline-config.yml'
+                    
+                    // Check if the YAML configuration file exists
+                    def yamlConfigExists = fileExists(yamlConfigPath)
+                    
+                    if (yamlConfigExists) {
+                        // Read the YAML configuration
+                        def pipelineConfigContent = readFile(file: yamlConfigPath)
+                        def pipelineConfig = readYaml text: pipelineConfigContent
+                    
+                        // Check the YAML configuration for the checkout strategy
+                        if (pipelineConfig.scmCheckoutStrategies) {
+                            def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
+                            def customStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'custom-checkout' }
+                            def repoToolStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'repo-tool-with-gh-token' }
+                            
+                            if (defaultStrategy) {
+                                echo "Checking out Source Code using 'SCM default' strategy."
+                                checkout scm
+                            } else if (customStrategy) {
+                                echo "Checking out Source Code using 'SCM custom-checkout' strategy."
+                                sh "./${customStrategy['checkout-script-name']}"
+                            } else if (repoToolStrategy) {
+                                echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
+                                
+                                // Implement repo-tool checkout logic here
+                                // ...
+                            } else {
+                                echo "No supported checkout strategy found in the configuration. Skipping checkout."
+                            }
                         } else {
-                            error "pipeline-config.yml file not found: $pipelineConfigPath"
+                            echo "No scmCheckoutStrategies defined in the configuration. Skipping checkout."
                         }
+                    } else {
+                        error "YAML configuration file not found: $yamlConfigPath"
                     }
                 }
             }
         }
     }
 }
+
+
+// def call() {
+//     def confluenceDocLink = 'https://your-confluence-link.com/documentation'
+//     pipeline {
+//         agent any
+//         options {
+//             ansiColor('xterm')
+//             timestamps()
+//         }
+        // triggers {
+        //     GenericTrigger(
+        //         token: "my-dummy-token",
+        //         printContributedVariables: true,
+        //         printPostContent: false,
+        //     )
+        // }
+//         stages {
+            // stage('Clean Workspace') {
+            //     steps {
+            //         echo "Starting 'Clean Workspace' stage"
+            //         cleanWs()
+            //         echo "${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully"
+            //         echo "View Documentation: ${confluenceDocLink}"
+            //     }
+            // }
+//             stage('Checkout') {
+//                 steps {
+//                     // Perform the checkout here, e.g., using Git
+//                     checkout scm
+//                 }
+//             }
+//             stage('Check Files') {
+//                 steps {
+//                     script {
+//                         def pipelineConfigPath = '.jenkins/pipeline-config.yml'
+
+//                         def pipelineConfigExists = fileExists(pipelineConfigPath)
+//                         if (pipelineConfigExists) {
+//                             echo "pipeline-config.yml file found: $pipelineConfigPath"
+//                         } else {
+//                             error "pipeline-config.yml file not found: $pipelineConfigPath"
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
 
 
 
@@ -88,89 +159,89 @@ def call() {
 //                 }
 //             }
 
-//             stage('Checkout') {
-//                 steps {
-//                     script {
-//                         echo "Starting 'Checkout' stage"
-//                         def pipelineConfigContent = readFile(file: pipelineConfigPath)
-//                         def pipelineConfig = readYaml text: pipelineConfigContent
+            // stage('Checkout') {
+            //     steps {
+            //         script {
+            //             echo "Starting 'Checkout' stage"
+            //             def pipelineConfigContent = readFile(file: pipelineConfigPath)
+            //             def pipelineConfig = readYaml text: pipelineConfigContent
 
-//                         echo "Starting 'Validate YAML Configuration' stage"
+            //             echo "Starting 'Validate YAML Configuration' stage"
 
-//                         def errors = []  // Create an array to collect errors
+            //             def errors = []  // Create an array to collect errors
 
-//                         try {
-//                             if (!pipelineConfig.token) {
-//                                 errors.add("Error: 'token' key is missing or misconfigured in the YAML configuration.")
-//                             }
+            //             try {
+            //                 if (!pipelineConfig.token) {
+            //                     errors.add("Error: 'token' key is missing or misconfigured in the YAML configuration.")
+            //                 }
 
-//                             if (!pipelineConfig.label) {
-//                                 errors.add("Error: 'label' key is missing or misconfigured in the YAML configuration.")
-//                             }
+            //                 if (!pipelineConfig.label) {
+            //                     errors.add("Error: 'label' key is missing or misconfigured in the YAML configuration.")
+            //                 }
 
-//                             if (!pipelineConfig.dockerImage) {
-//                                 errors.add("Error: 'dockerImage' key is missing or misconfigured in the YAML configuration.")
-//                             }
+            //                 if (!pipelineConfig.dockerImage) {
+            //                     errors.add("Error: 'dockerImage' key is missing or misconfigured in the YAML configuration.")
+            //                 }
 
-//                             if (!pipelineConfig.scmCheckoutStrategies) {
-//                                 errors.add("Error: 'scmCheckoutStrategies' key is missing or misconfigured in the YAML configuration.")
-//                             }
+            //                 if (!pipelineConfig.scmCheckoutStrategies) {
+            //                     errors.add("Error: 'scmCheckoutStrategies' key is missing or misconfigured in the YAML configuration.")
+            //                 }
 
-//                             if (errors) {
-//                                 // If there are errors, log each one
-//                                 for (error in errors) {
-//                                     error(error)
-//                                 }
-//                             } else {
-//                                 echo "YAML configuration is valid."
-//                             }
+            //                 if (errors) {
+            //                     // If there are errors, log each one
+            //                     for (error in errors) {
+            //                         error(error)
+            //                     }
+            //                 } else {
+            //                     echo "YAML configuration is valid."
+            //                 }
 
-//                             if (pipelineConfig.scmCheckoutStrategies) {
-//                                 def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
-//                                 def customStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'custom-checkout' }
-//                                 def repoToolStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'repo-tool-with-gh-token' }
+            //                 if (pipelineConfig.scmCheckoutStrategies) {
+            //                     def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
+            //                     def customStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'custom-checkout' }
+            //                     def repoToolStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'repo-tool-with-gh-token' }
 
-//                                 if (defaultStrategy) {
-//                                     echo "Checking out Source Code using 'SCM default' strategy."
-//                                     checkout scm
-//                                 } else if (customStrategy) {
-//                                     echo "Checking out Source Code using 'SCM custom-checkout' strategy."
-//                                     sh "./${customStrategy['checkout-script-name']}"
-//                                 } else if (repoToolStrategy) {
-//                                     echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
+            //                     if (defaultStrategy) {
+            //                         echo "Checking out Source Code using 'SCM default' strategy."
+            //                         checkout scm
+            //                     } else if (customStrategy) {
+            //                         echo "Checking out Source Code using 'SCM custom-checkout' strategy."
+            //                         sh "./${customStrategy['checkout-script-name']}"
+            //                     } else if (repoToolStrategy) {
+            //                         echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
 
-//                                     // Check if 'repo' tool is installed
-//                                     def repoToolInstalled = sh(script: "which repo", returnStatus: true)
-//                                     if (repoToolInstalled != 0) {
-//                                         error "Error: The 'repo' tool is not installed. Please install 'repo' tool or choose a different checkout strategy. Refer to the documentation for guidance: [${confluenceDocLink}]"
-//                                     }
+            //                         // Check if 'repo' tool is installed
+            //                         def repoToolInstalled = sh(script: "which repo", returnStatus: true)
+            //                         if (repoToolInstalled != 0) {
+            //                             error "Error: The 'repo' tool is not installed. Please install 'repo' tool or choose a different checkout strategy. Refer to the documentation for guidance: [${confluenceDocLink}]"
+            //                         }
 
-//                                     // Fetch the manifest repository
-//                                     dir('repo') {
-//                                         script {
-//                                             // Add the directory containing 'repo' to the PATH
-//                                             def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
-//                                             env.PATH = "${repoDir}:${env.PATH}"
-//                                         }
-//                                         withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
-//                                             sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']} -g ${repoToolStrategy['repo-manifest-group']}"
-//                                             sh "repo sync"
-//                                         }
-//                                     }
-//                                     // Checkout the specified manifest group (uncomment if needed)
-//                                     // sh "repo forall -c 'git checkout ${repoToolStrategy['repo-manifest-branch']}' -g ${repoToolStrategy['repo-manifest-group']}"
-//                                 } else {
-//                                     echo "No supported checkout strategy found in the configuration. Skipping checkout."
-//                                 }
-//                             } else {
-//                                 echo "No scmCheckoutStrategies defined in the configuration. Skipping checkout."
-//                             }
-//                         } catch (e) {
-//                             error "Error: Failed to validate the YAML configuration or checkout source code. Please check the configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
-//                         }
-//                     }
-//                 }
-//             }
+            //                         // Fetch the manifest repository
+            //                         dir('repo') {
+            //                             script {
+            //                                 // Add the directory containing 'repo' to the PATH
+            //                                 def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
+            //                                 env.PATH = "${repoDir}:${env.PATH}"
+            //                             }
+            //                             withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
+            //                                 sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']} -g ${repoToolStrategy['repo-manifest-group']}"
+            //                                 sh "repo sync"
+            //                             }
+            //                         }
+            //                         // Checkout the specified manifest group (uncomment if needed)
+            //                         // sh "repo forall -c 'git checkout ${repoToolStrategy['repo-manifest-branch']}' -g ${repoToolStrategy['repo-manifest-group']}"
+            //                     } else {
+            //                         echo "No supported checkout strategy found in the configuration. Skipping checkout."
+            //                     }
+            //                 } else {
+            //                     echo "No scmCheckoutStrategies defined in the configuration. Skipping checkout."
+            //                 }
+            //             } catch (e) {
+            //                 error "Error: Failed to validate the YAML configuration or checkout source code. Please check the configuration. Refer to the documentation for guidance: [${confluenceDocLink}]"
+            //             }
+            //         }
+            //     }
+            // }
 
 //             stage('Read Docker Image Name') {
 //                 steps {
