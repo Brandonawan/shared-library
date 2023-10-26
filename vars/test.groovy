@@ -1,67 +1,70 @@
 #!/usr/bin/env groovy
-pipeline {
-    agent any
-    options {
-        ansiColor('xterm')
-        timestamps()
-    }
-    triggers {
-        GenericTrigger(
-            token: "my-dummy-token",
-            printContributedVariables: true,
-            printPostContent: false,
-        )
-    }
-    stages {
-        stage('Clean Workspace') {
-            steps {
-                echo "Starting 'Clean Workspace' stage"
-                cleanWs()
-                echo "${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully"
-                echo "View Documentation: ${confluenceDocLink}"
-            }
+
+def call(){
+    pipeline {
+        agent any
+        options {
+            ansiColor('xterm')
+            timestamps()
         }
-        stage('Checkout') {
-            steps {
-                script {
-                    echo "Starting 'Checkout' stage"
-                    
-                    // Define the path to the YAML configuration file
-                    def yamlConfigPath = '.jenkins/pipeline-config.yml'
-                    
-                    // Check if the YAML configuration file exists
-                    def yamlConfigExists = fileExists(yamlConfigPath)
-                    
-                    if (yamlConfigExists) {
-                        // Read the YAML configuration
-                        def pipelineConfigContent = readFile(file: yamlConfigPath)
-                        def pipelineConfig = readYaml text: pipelineConfigContent
-                    
-                        // Check the YAML configuration for the checkout strategy
-                        if (pipelineConfig.scmCheckoutStrategies) {
-                            def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
-                            def customStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'custom-checkout' }
-                            def repoToolStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'repo-tool-with-gh-token' }
-                            
-                            if (defaultStrategy) {
-                                echo "Checking out Source Code using 'SCM default' strategy."
-                                checkout scm
-                            } else if (customStrategy) {
-                                echo "Checking out Source Code using 'SCM custom-checkout' strategy."
-                                sh "./${customStrategy['checkout-script-name']}"
-                            } else if (repoToolStrategy) {
-                                echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
+        triggers {
+            GenericTrigger(
+                token: "my-dummy-token",
+                printContributedVariables: true,
+                printPostContent: false,
+            )
+        }
+        stages {
+            stage('Clean Workspace') {
+                steps {
+                    echo "Starting 'Clean Workspace' stage"
+                    cleanWs()
+                    echo "${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully"
+                    echo "View Documentation: ${confluenceDocLink}"
+                }
+            }
+            stage('Checkout') {
+                steps {
+                    script {
+                        echo "Starting 'Checkout' stage"
+                        
+                        // Define the path to the YAML configuration file
+                        def yamlConfigPath = '.jenkins/pipeline-config.yml'
+                        
+                        // Check if the YAML configuration file exists
+                        def yamlConfigExists = fileExists(yamlConfigPath)
+                        
+                        if (yamlConfigExists) {
+                            // Read the YAML configuration
+                            def pipelineConfigContent = readFile(file: yamlConfigPath)
+                            def pipelineConfig = readYaml text: pipelineConfigContent
+                        
+                            // Check the YAML configuration for the checkout strategy
+                            if (pipelineConfig.scmCheckoutStrategies) {
+                                def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
+                                def customStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'custom-checkout' }
+                                def repoToolStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'repo-tool-with-gh-token' }
                                 
-                                // Implement repo-tool checkout logic here
-                                // ...
+                                if (defaultStrategy) {
+                                    echo "Checking out Source Code using 'SCM default' strategy."
+                                    checkout scm
+                                } else if (customStrategy) {
+                                    echo "Checking out Source Code using 'SCM custom-checkout' strategy."
+                                    sh "./${customStrategy['checkout-script-name']}"
+                                } else if (repoToolStrategy) {
+                                    echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
+                                    
+                                    // Implement repo-tool checkout logic here
+                                    // ...
+                                } else {
+                                    echo "No supported checkout strategy found in the configuration. Skipping checkout."
+                                }
                             } else {
-                                echo "No supported checkout strategy found in the configuration. Skipping checkout."
+                                echo "No scmCheckoutStrategies defined in the configuration. Skipping checkout."
                             }
                         } else {
-                            echo "No scmCheckoutStrategies defined in the configuration. Skipping checkout."
+                            error "YAML configuration file not found: $yamlConfigPath"
                         }
-                    } else {
-                        error "YAML configuration file not found: $yamlConfigPath"
                     }
                 }
             }
