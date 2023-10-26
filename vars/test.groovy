@@ -11,7 +11,7 @@ def call() {
         }
         triggers {
             GenericTrigger(
-                token: "none",
+                token: "my-dummy-token",
                 printContributedVariables: true,
                 printPostContent: false,
             )
