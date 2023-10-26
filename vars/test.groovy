@@ -22,10 +22,10 @@ def call() {
                         echo "Starting 'Checkout' stage"
                         
                         sh 'pwd'
-                        sh 'ls'
+                        sh 'ls -la'
                         // Define the path to the YAML configuration file
                         def yamlConfigPath = '.jenkins/pipeline-config.yml'
-                        sh "${yamlConfigPath}"
+                        sh "cat ${yamlConfigPath}"
                         // Check if the YAML configuration file exists
                         def yamlConfigExists = fileExists(yamlConfigPath)
                         
