@@ -104,7 +104,7 @@ def call() {
                     //     } else {
                     //         error "YAML configuration file not found: $yamlConfigPath"
                     //     }
-                    // }
+                    }
                 }
             }
         }
