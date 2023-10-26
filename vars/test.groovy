@@ -42,31 +42,32 @@ def call() {
                                 def pipelineConfigContent = readFile(file: yamlConfigPath)
                                 def pipelineConfig = readYaml text: pipelineConfigContent
 
-                                def errors = []  // Create an array to collect errors
-
-                                if (!pipelineConfig.token || pipelineConfig.token.isEmpty()) {
-                                    errors.add("Error: 'token' key is missing or empty in the YAML configuration.")
-                                }
-
-                                if (!pipelineConfig.label || pipelineConfig.label.isEmpty()) {
-                                    errors.add("Error: 'label' key is missing or empty in the YAML configuration.")
-                                }
-
-                                if (!pipelineConfig.dockerImage || pipelineConfig.dockerImage.isEmpty()) {
-                                    errors.add("Error: 'dockerImage' key is missing or empty in the YAML configuration.")
-                                }
-
-                                if (!pipelineConfig.scmCheckoutStrategies || pipelineConfig.scmCheckoutStrategies.isEmpty()) {
-                                    errors.add("Error: 'scmCheckoutStrategies' key is missing or empty in the YAML configuration.")
-                                }
-
-                                if (errors) {
-                                    // If there are errors, log each one
-                                    for (error in errors) {
-                                        error(error)
-                                    }
+                                if (!pipelineConfig) {
+                                    error "Error: The YAML configuration is empty or malformed."
                                 } else {
-                                    echo "YAML configuration is valid."
+                                    def missingKeys = []
+
+                                    if (!pipelineConfig.token) {
+                                        missingKeys.add("'token'")
+                                    }
+
+                                    if (!pipelineConfig.label) {
+                                        missingKeys.add("'label'")
+                                    }
+
+                                    if (!pipelineConfig.dockerImage) {
+                                        missingKeys.add("'dockerImage'")
+                                    }
+
+                                    if (!pipelineConfig.scmCheckoutStrategies) {
+                                        missingKeys.add("'scmCheckoutStrategies'")
+                                    }
+
+                                    if (missingKeys) {
+                                        error "Error: The following keys are missing in the YAML configuration: ${missingKeys.join(', ')}."
+                                    } else {
+                                        echo "YAML configuration is valid."
+                                    }
                                 }
                             } else {
                                 error "YAML configuration file not found: $yamlConfigPath"
