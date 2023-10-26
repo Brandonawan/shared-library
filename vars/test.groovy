@@ -1,8 +1,8 @@
 #!/usr/bin/env groovy
 
 def call() {
-    def jenkinsBuildPath = 'jenkins/jenkin-build'
-    def pipelineConfigPath = 'jenkins/pipeline-config.yml'
+    def jenkinsBuildPath = '.jenkins/jenkin-build'
+    def pipelineConfigPath = '.jenkins/pipeline-config.yml'
     def confluenceDocLink = 'https://your-confluence-link.com/documentation'
 
     pipeline {
