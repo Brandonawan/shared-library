@@ -19,6 +19,9 @@ def call() {
                 steps {
                     sh 'pwd'
                     sh 'ls -la'
+                    sh 'cat .jenkins/pipeline-config.yml'
+                    sh 'cat .jenkins/jenkins-build'
+                    sh 'cat Jenkinsfile'
                     echo "Starting 'Clean Workspace' stage"
                     cleanWs()
                     echo "${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully"
