@@ -18,7 +18,7 @@ def call() {
             stage('Checkout') {
                 steps {
                     script {
-                        sh 'cat .jenkins/pipeline-config.yml'
+                        // sh 'cat .jenkins/pipeline-config.yml'
                         echo "Starting 'Checkout' stage"
                         
                         sh 'pwd'
@@ -28,7 +28,7 @@ def call() {
                             sh 'ls -la'
                                 // Define the path to the YAML configuration file
                             def yamlConfigPath = 'pipeline-config.yml'
-                            sh "cat ${yamlConfigPath}"
+                            // sh "cat ${yamlConfigPath}"
                             
                             // Check if the YAML configuration file exists
                             def yamlConfigExists = fileExists(yamlConfigPath)
@@ -45,8 +45,7 @@ def call() {
                                     def customStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'custom-checkout' }
                                     def repoToolStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'repo-tool-with-gh-token' }
                                     
-                                    sh 'cat ${customStrategy}}'
-                                    sh 'pwd ${customStrategy}}'
+                                    sh 'echo ${customStrategy}}'
                                     if (defaultStrategy) {
                                         echo "Checking out Source Code using 'SCM default' strategy."
                                         checkout scm
