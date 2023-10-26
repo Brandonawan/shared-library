@@ -204,3 +204,86 @@ def checkIfJenkinsBuildIsExecutable(fileName) {
             //         sh 'ls -la'
             //     }
             // }
+
+
+#!/usr/bin/env groovy
+
+def call() {
+    def confluenceDocLink = 'https://your-confluence-link.com/documentation'
+
+    pipeline {
+        agent any
+        options {
+            ansiColor('xterm')
+            timestamps()
+        }
+        triggers {
+            GenericTrigger(
+                token: "my-dummy-token",
+                printContributedVariables: true,
+                printPostContent: false,
+            )
+        }
+        stages {
+            stage('Validate YAML Configuration') {
+                steps {
+                    script {
+                        echo "Checking for files in the workspace"
+                        sh 'pwd'
+                        sh 'ls -la'
+                        dir('.jenkins') {
+                            sh 'pwd'
+                            sh 'ls -la'
+
+                            // Define the path to the YAML configuration file
+                            def yamlConfigPath = 'pipeline-config.yml'
+
+                            // Check if the YAML configuration file exists
+                            def yamlConfigExists = fileExists(yamlConfigPath)
+
+                            if (yamlConfigExists) {
+
+                                echo "YAML configuration file found: $yamlConfigPath"
+
+                                echo "Starting 'Validate YAML Configuration' stage"
+                                // Read the YAML configuration
+                                def pipelineConfigContent = readFile(file: yamlConfigPath)
+                                def pipelineConfig = readYaml text: pipelineConfigContent
+
+                                if (!pipelineConfig) {
+                                    error "Error: The YAML configuration is empty or malformed."
+                                } else {
+                                    def missingKeys = []
+
+                                    if (!pipelineConfig.token) {
+                                        missingKeys.add("'token'")
+                                    }
+
+                                    if (!pipelineConfig.label) {
+                                        missingKeys.add("'label'")
+                                    }
+
+                                    if (!pipelineConfig.dockerImage) {
+                                        missingKeys.add("'dockerImage'")
+                                    }
+
+                                    if (!pipelineConfig.scmCheckoutStrategies) {
+                                        missingKeys.add("'scmCheckoutStrategies'")
+                                    }
+
+                                    if (missingKeys) {
+                                        error "Error: The following keys are missing in the YAML configuration: ${missingKeys.join(', ')}."
+                                    } else {
+                                        echo "YAML configuration is valid."
+                                    }
+                                }
+                            } else {
+                                error "YAML configuration file not found: $yamlConfigPath"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
