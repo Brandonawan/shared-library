@@ -2,10 +2,19 @@
 def call() {
     def confluenceDocLink = 'https://your-confluence-link.com/documentation'
     pipeline {
-        agent any
+        agent {
+            label none
+        }
         options {
             ansiColor('xterm')
             timestamps()
+        }
+        triggers {
+            GenericTrigger(
+                token: none,
+                printContributedVariables: true,
+                printPostContent: false,
+            )
         }
         stages {
             stage('Clean Workspace') {

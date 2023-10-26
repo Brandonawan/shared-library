@@ -2,6 +2,8 @@ token: MEV_CI_DOCS
 label: component-ci-nodes
 dockerImage: dockerImage: artifacts-bxdsw.sc.intel.com:9444/mev/fedora:30
 
+scriptPath: .jenkins/jenkin-build
+
 scmCheckoutStrategies: 
   - strategy-name: default
   # - strategy-name: repo-tool-with-gh-token
