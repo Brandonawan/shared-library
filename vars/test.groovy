@@ -59,6 +59,13 @@ def call() {
                                     if (repoToolInstalled != 0) {
                                         error "Error: The 'repo' tool is not installed. Please install 'repo' tool or choose a different checkout strategy. Refer to the documentation for guidance: [${confluenceDocLink}]"
                                     }
+                                    // Fetch the manifest repository
+                                    dir('repo') {
+                                        script {
+                                            // Add the directory containing 'repo' to the PATH
+                                            def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
+                                            env.PATH = "${repoDir}:${env.PATH}"
+                                        }
   
                                     withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
                                         sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
