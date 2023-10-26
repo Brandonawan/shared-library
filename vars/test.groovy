@@ -55,8 +55,10 @@ def call() {
                                     } else if (repoToolStrategy) {
                                         echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
                                         
-                                        // Implement repo-tool checkout logic here
-                                        // ...
+                                     withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
+                                            sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
+                                            sh "repo sync"
+                                        }
                                     } else {
                                         echo "No supported checkout strategy found in the configuration. Skipping checkout."
                                     }
@@ -74,57 +76,6 @@ def call() {
         }
     }
 }
-
-
-// def call() {
-//     def confluenceDocLink = 'https://your-confluence-link.com/documentation'
-//     pipeline {
-//         agent any
-//         options {
-//             ansiColor('xterm')
-//             timestamps()
-//         }
-        // triggers {
-        //     GenericTrigger(
-        //         token: "my-dummy-token",
-        //         printContributedVariables: true,
-        //         printPostContent: false,
-        //     )
-        // }
-//         stages {
-            // stage('Clean Workspace') {
-            //     steps {
-            //         echo "Starting 'Clean Workspace' stage"
-            //         cleanWs()
-            //         echo "${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully"
-            //         echo "View Documentation: ${confluenceDocLink}"
-            //     }
-            // }
-//             stage('Checkout') {
-//                 steps {
-//                     // Perform the checkout here, e.g., using Git
-//                     checkout scm
-//                 }
-//             }
-//             stage('Check Files') {
-//                 steps {
-//                     script {
-//                         def pipelineConfigPath = '.jenkins/pipeline-config.yml'
-
-//                         def pipelineConfigExists = fileExists(pipelineConfigPath)
-//                         if (pipelineConfigExists) {
-//                             echo "pipeline-config.yml file found: $pipelineConfigPath"
-//                         } else {
-//                             error "pipeline-config.yml file not found: $pipelineConfigPath"
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-//     }
-// }
-
-
 
 
 // def call() {
@@ -229,10 +180,10 @@ def call() {
             //                                 def repoDir = '/var/lib/jenkins/bin'  // Adjust to the actual path where 'repo' is located
             //                                 env.PATH = "${repoDir}:${env.PATH}"
             //                             }
-            //                             withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
-            //                                 sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']} -g ${repoToolStrategy['repo-manifest-group']}"
-            //                                 sh "repo sync"
-            //                             }
+                                        // withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
+                                        //     sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']} -g ${repoToolStrategy['repo-manifest-group']}"
+                                        //     sh "repo sync"
+                                        // }
             //                         }
             //                         // Checkout the specified manifest group (uncomment if needed)
             //                         // sh "repo forall -c 'git checkout ${repoToolStrategy['repo-manifest-branch']}' -g ${repoToolStrategy['repo-manifest-group']}"
