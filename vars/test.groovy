@@ -17,7 +17,7 @@ def call() {
             )
         }
         stages {
-            stage('Checkout') {
+            stage('Validate YAML Configuration') {
                 steps {
                     script {
                         echo "Checking for files in the workspace"
@@ -45,8 +45,8 @@ def call() {
                                 def errors = []  // Create an array to collect errors
 
                                 try {
-                                    if (!pipelineConfig.token) {
-                                        errors.add("Error: 'token' key is missing or misconfigured in the YAML configuration.")
+                                    if (!pipelineConfig.token || pipelineConfig.token.isEmpty()) {
+                                        errors.add("Error: 'token' key is missing or empty in the YAML configuration.")
                                     }
 
                                     if (!pipelineConfig.label) {
@@ -141,6 +141,7 @@ def call() {
         }
     }
 }
+
 
 
 
