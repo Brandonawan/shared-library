@@ -26,8 +26,9 @@ def call() {
                         // Define the path to the YAML configuration file
                         def yamlConfigPath = '.jenkins/pipeline-config.yml'
                         sh "cat ${yamlConfigPath}"
+                        
                         // Check if the YAML configuration file exists
-                        def yamlConfigExists = fileExists(yamlConfigPath)
+                        def yamlConfigExists = fileExists(dir('${yamlConfigPath}'))
                         
                         if (yamlConfigExists) {
                             // Read the YAML configuration
