@@ -17,6 +17,9 @@ def call() {
         stages {
             stage('Clean Workspace') {
                 steps {
+                    pwd()
+                    ls()
+                    sh 'ls -la'
                     echo "Starting 'Clean Workspace' stage"
                     cleanWs()
                     echo "${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully"
