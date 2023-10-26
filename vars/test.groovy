@@ -54,11 +54,16 @@ def call() {
                                         sh "./${customStrategy['checkout-script-name']}"
                                     } else if (repoToolStrategy) {
                                         echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
-                                        
-                                     withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
-                                            sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
-                                            sh "repo sync"
-                                        }
+                                         // Check if 'repo' tool is installed
+                                    def repoToolInstalled = sh(script: "which repo", returnStatus: true)
+                                    if (repoToolInstalled != 0) {
+                                        error "Error: The 'repo' tool is not installed. Please install 'repo' tool or choose a different checkout strategy. Refer to the documentation for guidance: [${confluenceDocLink}]"
+                                    }
+  
+                                    withCredentials([string(credentialsId: repoToolStrategy['github-token-jenkins-credential-id'], variable: 'GITHUB_TOKEN')]) {
+                                        sh "repo init -u ${repoToolStrategy['repo-manifest-url']} -b ${repoToolStrategy['repo-manifest-branch']}"
+                                        sh "repo sync"
+                                    }
                                     } else {
                                         echo "No supported checkout strategy found in the configuration. Skipping checkout."
                                     }
@@ -167,11 +172,11 @@ def call() {
             //                     } else if (repoToolStrategy) {
             //                         echo "Checking out Source Code using 'repo-tool-with-gh-token' strategy."
 
-            //                         // Check if 'repo' tool is installed
-            //                         def repoToolInstalled = sh(script: "which repo", returnStatus: true)
-            //                         if (repoToolInstalled != 0) {
-            //                             error "Error: The 'repo' tool is not installed. Please install 'repo' tool or choose a different checkout strategy. Refer to the documentation for guidance: [${confluenceDocLink}]"
-            //                         }
+                                    // Check if 'repo' tool is installed
+                                    def repoToolInstalled = sh(script: "which repo", returnStatus: true)
+                                    if (repoToolInstalled != 0) {
+                                        error "Error: The 'repo' tool is not installed. Please install 'repo' tool or choose a different checkout strategy. Refer to the documentation for guidance: [${confluenceDocLink}]"
+                                    }
 
             //                         // Fetch the manifest repository
             //                         dir('repo') {
