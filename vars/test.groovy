@@ -38,13 +38,15 @@ def call() {
                                 def pipelineConfigContent = readFile(file: yamlConfigPath)
                                 def pipelineConfig = readYaml text: pipelineConfigContent
                             
-                                
+
                                 // Check the YAML configuration for the checkout strategy
                                 if (pipelineConfig.scmCheckoutStrategies) {
                                     def defaultStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'default' }
                                     def customStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'custom-checkout' }
                                     def repoToolStrategy = pipelineConfig.scmCheckoutStrategies.find { it['strategy-name'] == 'repo-tool-with-gh-token' }
                                     
+                                    sh 'cat ${customStrategy}}'
+                                    sh 'pwd ${customStrategy}}'
                                     if (defaultStrategy) {
                                         echo "Checking out Source Code using 'SCM default' strategy."
                                         checkout scm
