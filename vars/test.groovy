@@ -15,13 +15,11 @@ def call() {
             )
         }
         stages {
-            stage('Clean Workspace') {
+            stage('Clean Jenkins Workspace') {
                 steps {
-                    pwd()
-                    ls()
-                    sh 'ls -la'
                     echo "Starting 'Clean Workspace' stage"
                     cleanWs()
+                    sh 'ls -la'  // Use the 'sh' step to execute 'ls' shell command
                     echo "${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully"
                     echo "View Documentation: ${confluenceDocLink}"
                 }
