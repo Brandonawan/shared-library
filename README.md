@@ -18,7 +18,7 @@ Project One Build Jenkins Pipeline Library is a collection of reusable Jenkins p
 Before using this Jenkins Pipeline Library, ensure you have the following prerequisites in your project repository inside a folder at the root called scripts:
 
 1. `scripts/pipeline-config.yml`: A YAML configuration file that specifies the Docker image name and other pipeline settings.
-2. `scripts/jenkin-build`: An executable script used for the Build stage.
+2. `scripts/jenkin-build`: An executable script used for the Build stage..
 
 ### Installation
 
